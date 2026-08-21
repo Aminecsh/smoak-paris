@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan V1 — Commande &amp; Livraison</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #ffffff; color: #111827; font-family: 'Plus Jakarta Sans', sans-serif; padding: 48px 24px 64px; }
+  .container { max-width: 740px; margin: 0 auto; }
+
+  .header { margin-bottom: 36px; padding-bottom: 32px; border-bottom: 1.5px solid #f1f5f9; }
+  .logo { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #f97316; margin-bottom: 20px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; color: #0f172a; line-height: 1.1; margin-bottom: 8px; }
+  .subtitle { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #94a3b8; }
+
+  .archi-note { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 22px; margin: 28px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .archi-icon { font-size: 22px; flex-shrink: 0; }
+  .archi-text { font-size: 13px; color: #9a3412; line-height: 1.55; }
+  .archi-text strong { color: #7c2d12; }
+
+  .stats { display: flex; gap: 12px; margin-bottom: 28px; }
+  .stat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 18px; text-align: center; flex: 1; }
+  .stat-val { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+  .stat-lbl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+  .flow { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; flex-wrap: wrap; }
+  .flow-step { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #0f172a; background: white; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 8px; }
+  .flow-arrow { color: #cbd5e1; font-size: 13px; }
+
+  .phases { display: flex; flex-direction: column; gap: 20px; }
+  .phase { border: 1.5px solid #e2e8f0; border-radius: 16px; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+  .phase:hover { border-color: var(--c); box-shadow: 0 2px 20px color-mix(in srgb, var(--c) 8%, transparent); }
+  .phase.priority { border-color: color-mix(in srgb, var(--c) 45%, white); border-width: 2px; }
+
+  .phase-header { padding: 16px 24px; background: color-mix(in srgb, var(--c) 5%, white); border-bottom: 1.5px solid color-mix(in srgb, var(--c) 12%, #e2e8f0); display: flex; align-items: center; justify-content: space-between; }
+  .phase-header-left { display: flex; align-items: center; gap: 10px; }
+  .phase-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--c); background: color-mix(in srgb, var(--c) 12%, white); border: 1px solid color-mix(in srgb, var(--c) 25%, white); padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .phase-title { font-size: 15px; font-weight: 800; color: #0f172a; }
+  .phase-subtitle { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .phase-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+  .priority-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: #d97706; background: #fef3c7; border: 1px solid #fde68a; padding: 3px 10px; border-radius: 20px; }
+  .impact { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+  .impact-high { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .impact-mid { color: #f97316; background: #fff7ed; border: 1px solid #fed7aa; }
+
+  .features { padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .feature { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border: 1px solid #f1f5f9; border-radius: 10px; background: #fafafa; transition: background 0.15s, border-color 0.15s; }
+  .feature:hover { background: white; border-color: #e2e8f0; }
+  .feature-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .feature-body { flex: 1; }
+  .feature-name { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+  .feature-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+  .feature-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+  .tag-core { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .tag-ux { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .tag-tech { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+  .tag-critical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+  .p1 { --c: #f97316; } .p2 { --c: #8b5cf6; } .p3 { --c: #0ea5e9; } .p4 { --c: #10b981; } .p5 { --c: #64748b; }
+
+  .out-scope { border: 1.5px dashed #e2e8f0; border-radius: 16px; padding: 18px 24px; }
+  .out-scope-title { font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 10px; }
+  .out-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .out-item { font-size: 12px; color: #94a3b8; background: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 12px; border-radius: 20px; }
+
+  .decisions { padding: 18px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .decision { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #334155; line-height: 1.5; }
+  .decision-mark { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b; flex-shrink: 0; margin-top: 2px; }
+
+  .note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px 20px; font-size: 13px; color: #1d4ed8; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start; margin-top: 28px; }
+  .note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">Plateforme de commande · V1</div>
+    <h1>Roadmap V1 — Commande &amp; Livraison</h1>
+    <p class="subtitle">Regard d'architecte · Parcours minimal, façon Deliveroo / Uber Eats</p>
+  </div>
+
+  <div class="archi-note">
+    <span class="archi-icon">🧭</span>
+    <span class="archi-text"><strong>Note d'architecte :</strong> l'objectif de la V1 n'est pas de tout construire, mais de livrer un parcours complet et fiable : accueil → commande → suivi GPS. Chaque lot ci-dessous se construit sur le précédent, dans l'ordre. Tout ce qui n'est pas indispensable au parcours de base part en V2.</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Lots</div></div>
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Pages</div></div>
+    <div class="stat"><div class="stat-val">2</div><div class="stat-lbl">Décisions clés</div></div>
+  </div>
+
+  <div class="flow">
+    <span class="flow-step">Accueil</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Commande</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Confirmation</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Suivi GPS</span>
+  </div>
+
+  <div class="phases">
+
+    <!-- LOT 1 -->
+    <div class="phase p1 priority">
+      <div class="phase-header">
+        <div class="phase-header-left">
+          <span class="phase-num">Lot 1</span>
+          <div>
+            <div class="phase-title">Socle</div>
+            <div class="phase-subtitle">Poser les deux premières pages du parcours</div>
+          </div>
+        </div>
+        <div class="phase-meta"><span class="priority-badge">★ À faire en premier</span><span class="impact impact-high">Fondation</span></div>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🏠</div>
+          <div class="feature-body">
+            <div class="feature-name">Page d'accueil</div>
+            <div class="feature-desc">Header, accroche, bouton "Commander" bien visible. C'est le point d'entrée unique du site, il doit rester simple.</div>
+            <div class="feature-tags"><span class="tag tag-core">Cœur du parcours</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📋</div>
+          <div class="feature-body">
+            <div class="feature-name">Catalogue produits (statique)</div>
+            <div class="feature-desc">Liste produits avec nom, image, prix, description courte. Données en dur ou petite base pour démarrer vite.</div>
+            <div class="feature-tags"><span class="tag tag-core">Cœur du parcours</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🛒</div>
+          <div class="feature-body">
+            <div class="feature-name">Panier fonctionnel</div>
+            <div class="feature-desc">Ajout/retrait, quantité, total en temps réel côté frontend. Pas besoin de backend à ce stade.</div>
+            <div class="feature-tags"><span class="tag tag-ux">UX</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOT 2 -->
+    <div class="phase p2">
+      <div class="phase-header">
+        <div class="phase-header-left">
+          <span class="phase-num">Lot 2</span>
+          <div>
+            <div class="phase-title">Commande réelle</div>
+            <div class="phase-subtitle">Brancher le backend et enregistrer de vraies commandes</div>
+          </div>
+        </div>
+        <div class="phase-meta"><span class="impact impact-high">Fort impact</span></div>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">⚙️</div>
+          <div class="feature-body">
+            <div class="feature-name">API de création de commande</div>
+            <div class="feature-desc">Endpoint backend qui reçoit le panier + infos client, et stocke la commande en base (PostgreSQL).</div>
+            <div class="feature-tags"><span class="tag tag-tech">Backend</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📍</div>
+          <div class="feature-body">
+            <div class="feature-name">Formulaire adresse + validation</div>
+            <div class="feature-desc">Nom, téléphone, adresse de livraison (idéalement avec autocomplétion), note pour le livreur.</div>
+            <div class="feature-tags"><span class="tag tag-ux">UX</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">✅</div>
+          <div class="feature-body">
+            <div class="feature-name">Page de confirmation</div>
+            <div class="feature-desc">Récap de la commande, numéro de commande, bouton "Suivre ma commande" vers le lot 3.</div>
+            <div class="feature-tags"><span class="tag tag-core">Cœur du parcours</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOT 3 -->
+    <div class="phase p3">
+      <div class="phase-header">
+        <div class="phase-header-left">
+          <span class="phase-num">Lot 3</span>
+          <div>
+            <div class="phase-title">Suivi de commande</div>
+            <div class="phase-subtitle">La brique différenciante : le tracking GPS</div>
+          </div>
+        </div>
+        <div class="phase-meta"><span class="impact impact-high">Fort impact</span></div>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">📡</div>
+          <div class="feature-body">
+            <div class="feature-name">Envoi de position par le livreur</div>
+            <div class="feature-desc">Interface (même minimaliste) qui envoie la position GPS du livreur toutes les X secondes au backend.</div>
+            <div class="feature-tags"><span class="tag tag-tech">Backend</span><span class="tag tag-critical">Critique</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🗺️</div>
+          <div class="feature-body">
+            <div class="feature-name">Carte de suivi en temps réel</div>
+            <div class="feature-desc">Mapbox ou Google Maps, marqueur livreur + marqueur adresse client, mise à jour via WebSocket ou polling.</div>
+            <div class="feature-tags"><span class="tag tag-core">Cœur du parcours</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔔</div>
+          <div class="feature-body">
+            <div class="feature-name">Statuts de commande</div>
+            <div class="feature-desc">Reçue → En préparation → En livraison → Livrée, affichés clairement avec une estimation d'arrivée (ETA).</div>
+            <div class="feature-tags"><span class="tag tag-ux">UX</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOT 4 -->
+    <div class="phase p4">
+      <div class="phase-header">
+        <div class="phase-header-left">
+          <span class="phase-num">Lot 4</span>
+          <div>
+            <div class="phase-title">Finitions V1</div>
+            <div class="phase-subtitle">Ce qui rend le parcours utilisable en vrai</div>
+          </div>
+        </div>
+        <div class="phase-meta"><span class="impact impact-mid">Impact moyen</span></div>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">💳</div>
+          <div class="feature-body">
+            <div class="feature-name">Paiement</div>
+            <div class="feature-desc">Stripe pour le paiement en ligne, ou option "paiement à la livraison" si on veut aller plus vite (voir décisions ci-dessous).</div>
+            <div class="feature-tags"><span class="tag tag-tech">Backend</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <div class="feature-body">
+            <div class="feature-name">Responsive mobile</div>
+            <div class="feature-desc">Essentiel : ce type de service est utilisé très majoritairement sur mobile, à traiter comme prioritaire, pas en option.</div>
+            <div class="feature-tags"><span class="tag tag-critical">Critique</span></div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🧪</div>
+          <div class="feature-body">
+            <div class="feature-name">Tests du parcours complet</div>
+            <div class="feature-desc">De la page d'accueil jusqu'à la livraison marquée "Livrée", en conditions réelles.</div>
+            <div class="feature-tags"><span class="tag tag-critical">Critique</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <br>
+
+  <div class="out-scope">
+    <div class="out-scope-title">🚫 Hors périmètre V1 — pour plus tard</div>
+    <div class="out-list">
+      <span class="out-item">Comptes clients + historique</span>
+      <span class="out-item">Multi-restaurants</span>
+      <span class="out-item">Avis / notation</span>
+      <span class="out-item">Codes promo</span>
+      <span class="out-item">App mobile native</span>
+      <span class="out-item">Optimisation d'itinéraire</span>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="phase p5">
+    <div class="phase-header">
+      <div class="phase-header-left">
+        <div>
+          <div class="phase-title">⚖️ Décisions à trancher avant de coder</div>
+        </div>
+      </div>
+    </div>
+    <div class="decisions">
+      <div class="decision"><span class="decision-mark">01</span> Paiement en ligne dès la V1, ou paiement à la livraison pour aller plus vite ?</div>
+      <div class="decision"><span class="decision-mark">02</span> WebSocket temps réel dès le lot 3, ou polling simple pour commencer ?</div>
+      <div class="decision"><span class="decision-mark">03</span> Un seul point de vente, ou plusieurs restaurants dès la V1 ?</div>
+      <div class="decision"><span class="decision-mark">04</span> Interface livreur : page web simplifiée, ou app dédiée ?</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="note-icon">💡</span>
+    <span><strong>Ma reco d'architecte :</strong> ne partez pas sur le Lot 4 avant que les Lots 1 à 3 fonctionnent de bout en bout, même en version brute. Un parcours complet mais simple vaut mieux qu'un parcours partiel avec plein de détails peaufinés.</span>
+  </div>
+
+</div>
+</body>
+</html>
