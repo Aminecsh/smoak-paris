@@ -1,86 +1,119 @@
 import { Product } from "./types";
 
-// Catalogue statique pour le Lot 1. Sera remplacé par une source
-// backend (base de données) au Lot 2.
+// Catalogue Smoak Paris — boissons fraîches / épicerie sucrée. La chicha
+// (Quasar / Khaloud, goûts, recharge, suppléments) est composée à part via
+// le composeur, voir src/lib/chicha.ts.
+//
+// ⚠️ Prix provisoires — à valider avant mise en vente. Restent aussi à
+// définir : les formats/fournisseurs précis (canettes, jus, bonbons,
+// chocolat Dubaï), les stocks de départ et les quantités maximum par
+// commande.
 export const products: Product[] = [
+  // Boissons — canettes, énergisantes, 1,5 L et jus.
   {
-    id: "chicha-solo",
-    name: "Chicha Solo",
-    description: "Narguilé, charbon naturel et saveur au choix. Pour 1 à 2 personnes.",
-    price: 19.9,
-    emoji: "💨",
-    category: "Chichas",
-  },
-  {
-    id: "chicha-duo",
-    name: "Chicha Duo",
-    description: "Format généreux, deux saveurs au choix. Pour 2 à 3 personnes.",
-    price: 24.9,
-    emoji: "💨",
-    category: "Chichas",
-  },
-  {
-    id: "chicha-party",
-    name: "Chicha Party",
-    description: "Le grand format pour vos soirées. Pour 4 à 6 personnes.",
-    price: 34.9,
-    emoji: "🎉",
-    category: "Chichas",
-  },
-  {
-    id: "recharge-double-pomme",
-    name: "Recharge Double Pomme",
-    description: "Pot de 50g, la saveur classique et intemporelle.",
-    price: 6.5,
-    emoji: "🍏",
-    category: "Saveurs & Recharges",
-  },
-  {
-    id: "recharge-menthe-glaciale",
-    name: "Recharge Menthe Glaciale",
-    description: "Pot de 50g, fraîcheur intense.",
-    price: 6.5,
-    emoji: "🌿",
-    category: "Saveurs & Recharges",
-  },
-  {
-    id: "recharge-raisin-menthe",
-    name: "Recharge Raisin Menthe",
-    description: "Pot de 50g, douceur fruitée et mentholée.",
-    price: 6.5,
-    emoji: "🍇",
-    category: "Saveurs & Recharges",
-  },
-  {
-    id: "charbon-coco",
-    name: "Charbon naturel noix de coco",
-    description: "Plateau de charbons naturels, combustion longue et propre.",
-    price: 4.9,
-    emoji: "🔥",
-    category: "Saveurs & Recharges",
-  },
-  {
-    id: "embouts-jetables",
-    name: "Embouts jetables",
-    description: "Lot de 10, pour une utilisation individuelle et hygiénique.",
-    price: 2.9,
-    emoji: "🔘",
-    category: "Saveurs & Recharges",
-  },
-  {
-    id: "the-menthe",
-    name: "Thé à la menthe maison",
-    description: "Infusé et servi frais.",
-    price: 3.5,
-    emoji: "🍵",
-    category: "Boissons",
-  },
-  {
-    id: "soda-artisanal",
-    name: "Soda artisanal",
-    description: "Sélection de sodas artisanaux.",
-    price: 3.9,
+    id: "canette-coca-cola",
+    name: "Coca-Cola",
+    description: "Canette.",
+    price: 2.5,
     emoji: "🥤",
     category: "Boissons",
+  },
+  {
+    id: "canette-oasis",
+    name: "Oasis",
+    description: "Canette.",
+    price: 2.5,
+    emoji: "🥤",
+    category: "Boissons",
+  },
+  {
+    id: "canette-hawaii",
+    name: "Hawaii",
+    description: "Canette.",
+    price: 2.5,
+    emoji: "🥤",
+    category: "Boissons",
+  },
+  {
+    id: "canette-dada",
+    name: "Dada",
+    description: "Canette.",
+    price: 2.5,
+    emoji: "🥤",
+    category: "Boissons",
+  },
+  {
+    id: "red-bull",
+    name: "Red Bull",
+    description: "Boisson énergisante.",
+    price: 3.5,
+    emoji: "⚡",
+    category: "Boissons",
+  },
+  {
+    id: "crazy-tiger",
+    name: "Crazy Tiger",
+    description: "Boisson énergisante.",
+    price: 3.5,
+    emoji: "⚡",
+    category: "Boissons",
+  },
+  {
+    id: "coca-cola-1-5l",
+    name: "Coca-Cola 1,5 L",
+    description: "Bouteille 1,5 L.",
+    price: 4.5,
+    emoji: "🧴",
+    category: "Boissons",
+  },
+  {
+    id: "oasis-1-5l",
+    name: "Oasis 1,5 L",
+    description: "Bouteille 1,5 L.",
+    price: 4.5,
+    emoji: "🧴",
+    category: "Boissons",
+  },
+  {
+    id: "jus-1-5l",
+    name: "Jus de fruits 1,5 L",
+    description: "Bouteille 1,5 L. Parfum à préciser.",
+    price: 4.5,
+    emoji: "🧃",
+    category: "Boissons",
+  },
+
+  // Épicerie sucrée
+  {
+    id: "bonbons-traditionnels",
+    name: "Bonbons traditionnels",
+    description: "Assortiment de bonbons classiques.",
+    price: 3.9,
+    emoji: "🍬",
+    category: "Épicerie sucrée",
+  },
+  {
+    id: "fils-rouges",
+    name: "Fils rouges",
+    description: "Bonbons fils rouges.",
+    price: 2.9,
+    emoji: "🍬",
+    category: "Épicerie sucrée",
+  },
+  {
+    id: "bonbons-cola",
+    name: "Bonbons Cola",
+    description: "Bonbons goût cola.",
+    price: 2.9,
+    emoji: "🍬",
+    category: "Épicerie sucrée",
+  },
+  {
+    id: "chocolat-dubai",
+    name: "Chocolat Dubaï",
+    description: "Chocolat Dubaï.",
+    price: 12.9,
+    emoji: "🍫",
+    category: "Épicerie sucrée",
   },
 ];

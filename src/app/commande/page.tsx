@@ -1,9 +1,17 @@
+"use client";
+
+import { useState } from "react";
 import { products } from "@/lib/products";
+import { chichaBases } from "@/lib/chicha";
 import ProductCard from "@/components/ProductCard";
+import ChichaCard from "@/components/ChichaCard";
+import ChichaConfiguratorModal from "@/components/ChichaConfiguratorModal";
 import CartPanel from "@/components/CartPanel";
 
 export default function CommandePage() {
   const categories = Array.from(new Set(products.map((p) => p.category)));
+  const [openChichaId, setOpenChichaId] = useState<string | null>(null);
+  const openChicha = chichaBases.find((c) => c.id === openChichaId) ?? null;
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
@@ -16,6 +24,21 @@ export default function CommandePage() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="flex flex-col gap-8 lg:col-span-2">
+          <section>
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+              Chicha
+            </h2>
+            <div className="flex flex-col gap-3">
+              {chichaBases.map((chicha) => (
+                <ChichaCard
+                  key={chicha.id}
+                  chicha={chicha}
+                  onSelect={setOpenChichaId}
+                />
+              ))}
+            </div>
+          </section>
+
           {categories.map((category) => (
             <section key={category}>
               <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
@@ -38,6 +61,13 @@ export default function CommandePage() {
           </div>
         </div>
       </div>
+
+      {openChicha && (
+        <ChichaConfiguratorModal
+          chicha={openChicha}
+          onClose={() => setOpenChichaId(null)}
+        />
+      )}
     </main>
   );
 }
