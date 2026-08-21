@@ -5,6 +5,7 @@ export interface Product {
   price: number;
   emoji: string;
   category: string;
+  image?: string;
 }
 
 export interface ChichaBase {
@@ -25,6 +26,7 @@ export interface ChichaSupplement {
   id: string;
   name: string;
   price: number;
+  image?: string;
 }
 
 export interface ChichaSupplementLine {

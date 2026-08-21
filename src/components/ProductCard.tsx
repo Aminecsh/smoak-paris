@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Product } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 
@@ -9,8 +10,18 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="flex items-start gap-4 rounded-xl border border-brand/10 bg-cream p-4">
-      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-white text-2xl">
-        {product.emoji}
+      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white text-2xl">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={56}
+            height={56}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          product.emoji
+        )}
       </div>
 
       <div className="min-w-0 flex-1">

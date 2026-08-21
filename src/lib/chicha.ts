@@ -57,9 +57,9 @@ export const extraFlavorSupplement: ChichaSupplement = {
 // catalogue que la section Boissons de la carte, listées une par une.
 export const drinkSupplements: ChichaSupplement[] = products
   .filter((p) => p.category === "Boissons")
-  .map((p) => ({ id: p.id, name: p.name, price: p.price }));
+  .map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image }));
 
 // Les sucreries proposables en supplément, listées une par une.
 export const sweetSupplements: ChichaSupplement[] = products
   .filter((p) => p.category === "Épicerie sucrée")
-  .map((p) => ({ id: p.id, name: p.name, price: p.price }));
+  .map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image }));

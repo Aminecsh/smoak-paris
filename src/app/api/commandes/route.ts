@@ -10,6 +10,7 @@ import {
   sweetSupplements,
 } from "@/lib/chicha";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { geocodeAddress } from "@/lib/geocode";
 
 interface OrderItemInput {
   productId: string;
@@ -30,13 +31,18 @@ interface ConfiguredChichaInput {
 interface OrderPayload {
   customer: {
     name: string;
+    email: string;
     phone: string;
     address: string;
+    addressPoint?: { lat: number; lng: number } | null;
     note?: string;
+    paymentMethod?: string;
   };
   items: OrderItemInput[];
   configuredChichas: ConfiguredChichaInput[];
 }
+
+const VALID_PAYMENT_METHODS = ["cb", "especes"];
 
 interface OrderItemRow {
   kind: "produit" | "chicha";
@@ -46,14 +52,27 @@ interface OrderItemRow {
   details: Record<string, unknown> | null;
 }
 
+interface StockDecrement {
+  id: string;
+  name: string;
+  quantity: number;
+}
+
+interface BuiltOrder {
+  itemRows: OrderItemRow[];
+  stockDecrements: StockDecrement[];
+}
+
 function isPositiveInt(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value > 0;
 }
 
-// Reconstruit les lignes de commande à partir du catalogue serveur — on ne
-// fait jamais confiance aux prix envoyés par le client.
-function buildOrderItems(payload: OrderPayload): OrderItemRow[] | { error: string } {
-  const rows: OrderItemRow[] = [];
+// Reconstruit les lignes de commande et les décomptes de stock à partir du
+// catalogue serveur — on ne fait jamais confiance aux prix envoyés par le
+// client.
+function buildOrder(payload: OrderPayload): BuiltOrder | { error: string } {
+  const itemRows: OrderItemRow[] = [];
+  const stockDecrements: StockDecrement[] = [];
 
   for (const item of payload.items ?? []) {
     if (!isPositiveInt(item.quantity)) {
@@ -63,12 +82,17 @@ function buildOrderItems(payload: OrderPayload): OrderItemRow[] | { error: strin
     if (!product) {
       return { error: `Produit inconnu : ${item.productId}` };
     }
-    rows.push({
+    itemRows.push({
       kind: "produit",
       name: product.name,
       unit_price: product.price,
       quantity: item.quantity,
       details: null,
+    });
+    stockDecrements.push({
+      id: product.id,
+      name: product.name,
+      quantity: item.quantity,
     });
   }
 
@@ -108,7 +132,7 @@ function buildOrderItems(payload: OrderPayload): OrderItemRow[] | { error: strin
       drinks.reduce((sum, d) => sum + (d?.price ?? 0), 0) +
       sweets.reduce((sum, s) => sum + (s?.price ?? 0), 0);
 
-    rows.push({
+    itemRows.push({
       kind: "chicha",
       name: `${base.name} — ${flavor.name}`,
       unit_price: unitPrice,
@@ -122,13 +146,51 @@ function buildOrderItems(payload: OrderPayload): OrderItemRow[] | { error: strin
         sweets: sweets.map((s) => s!.name),
       },
     });
+
+    stockDecrements.push({ id: base.id, name: base.name, quantity: chicha.quantity });
+    stockDecrements.push({ id: flavor.id, name: flavor.name, quantity: chicha.quantity });
+    if (extraFlavor) {
+      stockDecrements.push({
+        id: extraFlavor.id,
+        name: extraFlavor.name,
+        quantity: chicha.quantity,
+      });
+    }
+    if (chicha.recharge) {
+      stockDecrements.push({
+        id: rechargeSupplement.id,
+        name: rechargeSupplement.name,
+        quantity: chicha.quantity,
+      });
+    }
+    if (chicha.extraCharcoal) {
+      stockDecrements.push({
+        id: charcoalSupplement.id,
+        name: charcoalSupplement.name,
+        quantity: chicha.quantity,
+      });
+    }
+    for (const drink of drinks) {
+      stockDecrements.push({
+        id: drink!.id,
+        name: drink!.name,
+        quantity: chicha.quantity,
+      });
+    }
+    for (const sweet of sweets) {
+      stockDecrements.push({
+        id: sweet!.id,
+        name: sweet!.name,
+        quantity: chicha.quantity,
+      });
+    }
   }
 
-  if (rows.length === 0) {
+  if (itemRows.length === 0) {
     return { error: "Le panier est vide" };
   }
 
-  return rows;
+  return { itemRows, stockDecrements };
 }
 
 export async function POST(request: NextRequest) {
@@ -139,54 +201,66 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const { name, phone, address } = payload.customer ?? {};
-  if (!name?.trim() || !phone?.trim() || !address?.trim()) {
+  const { name, email, phone, address, addressPoint, paymentMethod } =
+    payload.customer ?? {};
+  if (!name?.trim() || !email?.trim() || !phone?.trim() || !address?.trim()) {
     return NextResponse.json(
-      { error: "Nom, téléphone et adresse sont obligatoires" },
+      { error: "Nom, email, téléphone et adresse sont obligatoires" },
       { status: 400 },
     );
   }
-
-  const itemRows = buildOrderItems(payload);
-  if ("error" in itemRows) {
-    return NextResponse.json({ error: itemRows.error }, { status: 400 });
+  if (paymentMethod && !VALID_PAYMENT_METHODS.includes(paymentMethod)) {
+    return NextResponse.json({ error: "Moyen de paiement invalide" }, { status: 400 });
   }
+
+  const built = buildOrder(payload);
+  if ("error" in built) {
+    return NextResponse.json({ error: built.error }, { status: 400 });
+  }
+  const { itemRows, stockDecrements } = built;
 
   const totalPrice = itemRows.reduce(
     (sum, row) => sum + row.unit_price * row.quantity,
     0,
   );
 
+  // Si le client a choisi une suggestion de l'autocomplétion, on a déjà des
+  // coordonnées fiables — sinon on géocode l'adresse tapée en repli.
+  const geo =
+    addressPoint && Number.isFinite(addressPoint.lat) && Number.isFinite(addressPoint.lng)
+      ? addressPoint
+      : await geocodeAddress(address.trim());
+
   const supabase = getSupabaseServerClient();
 
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .insert({
-      customer_name: name.trim(),
-      customer_phone: phone.trim(),
-      delivery_address: address.trim(),
-      delivery_note: payload.customer.note?.trim() || null,
-      payment_method: "a_la_livraison",
-      status: "recue",
-      total_price: totalPrice,
-    })
-    .select("id, order_number")
-    .single();
+  const { data, error } = await supabase.rpc("create_order", {
+    p_customer_name: name.trim(),
+    p_customer_phone: phone.trim(),
+    p_delivery_address: address.trim(),
+    p_delivery_note: payload.customer.note?.trim() || null,
+    p_total_price: totalPrice,
+    p_order_items: itemRows,
+    p_stock_decrements: stockDecrements,
+    p_delivery_lat: geo?.lat ?? null,
+    p_delivery_lng: geo?.lng ?? null,
+    p_customer_email: email.trim(),
+    p_payment_method: paymentMethod ?? "especes",
+  });
 
-  if (orderError || !order) {
+  if (error) {
+    const isStockError = error.message?.includes("Stock insuffisant");
     return NextResponse.json(
-      { error: orderError?.message ?? "Erreur lors de la création de la commande" },
-      { status: 500 },
+      { error: error.message },
+      { status: isStockError ? 409 : 500 },
     );
   }
 
-  const { error: itemsError } = await supabase.from("order_items").insert(
-    itemRows.map((row) => ({ ...row, order_id: order.id })),
-  );
-
-  if (itemsError) {
-    await supabase.from("orders").delete().eq("id", order.id);
-    return NextResponse.json({ error: itemsError.message }, { status: 500 });
+  const order = data?.[0];
+  if (!order) {
+    return NextResponse.json(
+      { error: "Erreur lors de la création de la commande" },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json(

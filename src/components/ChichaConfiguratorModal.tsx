@@ -250,12 +250,23 @@ export default function ChichaConfiguratorModal({
               {drinkSupplements.map((drink) => (
                 <label
                   key={drink.id}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60"
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60"
                 >
-                  <span className="text-brand">
-                    {drink.name}
-                    <span className="ml-2 font-mono text-xs text-brand/50">
-                      +{drink.price.toFixed(2)} €
+                  <span className="flex min-w-0 items-center gap-3">
+                    {drink.image && (
+                      <Image
+                        src={drink.image}
+                        alt={drink.name}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                      />
+                    )}
+                    <span className="truncate text-brand">
+                      {drink.name}
+                      <span className="ml-2 font-mono text-xs text-brand/50">
+                        +{drink.price.toFixed(2)} €
+                      </span>
                     </span>
                   </span>
                   <input
@@ -264,7 +275,7 @@ export default function ChichaConfiguratorModal({
                     onChange={() =>
                       setDrinkIds((prev) => toggleId(prev, drink.id))
                     }
-                    className="h-4 w-4 accent-brand"
+                    className="h-4 w-4 flex-shrink-0 accent-brand"
                   />
                 </label>
               ))}
@@ -280,12 +291,23 @@ export default function ChichaConfiguratorModal({
               {sweetSupplements.map((sweet) => (
                 <label
                   key={sweet.id}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60"
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60"
                 >
-                  <span className="text-brand">
-                    {sweet.name}
-                    <span className="ml-2 font-mono text-xs text-brand/50">
-                      +{sweet.price.toFixed(2)} €
+                  <span className="flex min-w-0 items-center gap-3">
+                    {sweet.image && (
+                      <Image
+                        src={sweet.image}
+                        alt={sweet.name}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                      />
+                    )}
+                    <span className="truncate text-brand">
+                      {sweet.name}
+                      <span className="ml-2 font-mono text-xs text-brand/50">
+                        +{sweet.price.toFixed(2)} €
+                      </span>
                     </span>
                   </span>
                   <input
@@ -294,7 +316,7 @@ export default function ChichaConfiguratorModal({
                     onChange={() =>
                       setSweetIds((prev) => toggleId(prev, sweet.id))
                     }
-                    className="h-4 w-4 accent-brand"
+                    className="h-4 w-4 flex-shrink-0 accent-brand"
                   />
                 </label>
               ))}

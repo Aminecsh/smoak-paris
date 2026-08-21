@@ -5,15 +5,25 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { products } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
+
+type PaymentMethod = "cb" | "especes";
 
 export default function LivraisonPage() {
   const router = useRouter();
   const { items, configuredChichas, totalPrice, clearCart } = useCart();
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [addressPoint, setAddressPoint] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
   const [note, setNote] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("especes");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +39,15 @@ export default function LivraisonPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer: { name, phone, address, note },
+          customer: {
+            name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+            email,
+            phone,
+            address: `${address.trim()}, ${postalCode.trim()}`,
+            addressPoint,
+            note,
+            paymentMethod,
+          },
           items: items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
@@ -124,14 +142,40 @@ export default function LivraisonPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+              Prénom
+            </label>
+            <input
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+              Nom
+            </label>
+            <input
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            />
+          </div>
+        </div>
+
         <div>
           <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
-            Nom
+            Email
           </label>
           <input
             required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
           />
         </div>
@@ -151,14 +195,37 @@ export default function LivraisonPage() {
 
         <div>
           <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
-            Adresse de livraison
+            Adresse
+          </label>
+          <div className="mt-1">
+            <AddressAutocomplete
+              value={address}
+              onChange={setAddress}
+              onSelect={(point, suggestedPostalCode) => {
+                setAddressPoint(point);
+                if (suggestedPostalCode) setPostalCode(suggestedPostalCode);
+              }}
+              placeholder="Numéro et rue"
+            />
+          </div>
+          <p className="mt-1 text-xs text-brand/40">
+            Choisis une adresse dans la liste proposée pour garantir la localisation.
+          </p>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            Code postal
           </label>
           <input
             required
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Numéro, rue, code postal, ville"
-            className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            inputMode="numeric"
+            pattern="\d{5}"
+            maxLength={5}
+            placeholder="91200"
+            className="mt-1 w-32 rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
           />
         </div>
 
@@ -174,8 +241,46 @@ export default function LivraisonPage() {
           />
         </div>
 
-        <div className="rounded-lg border border-brand/10 bg-cream px-4 py-3 text-sm text-brand/70">
-          Paiement à la livraison.
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            Paiement à la livraison
+          </label>
+          <div className="mt-1 grid grid-cols-2 gap-3">
+            <label
+              className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm ${
+                paymentMethod === "cb"
+                  ? "border-brand bg-cream text-brand"
+                  : "border-brand/20 text-brand/70"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="cb"
+                checked={paymentMethod === "cb"}
+                onChange={() => setPaymentMethod("cb")}
+                className="h-4 w-4 accent-brand"
+              />
+              Carte bancaire
+            </label>
+            <label
+              className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm ${
+                paymentMethod === "especes"
+                  ? "border-brand bg-cream text-brand"
+                  : "border-brand/20 text-brand/70"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment"
+                value="especes"
+                checked={paymentMethod === "especes"}
+                onChange={() => setPaymentMethod("especes")}
+                className="h-4 w-4 accent-brand"
+              />
+              Espèces
+            </label>
+          </div>
         </div>
 
         {error && (

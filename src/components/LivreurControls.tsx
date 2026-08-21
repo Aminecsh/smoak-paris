@@ -1,0 +1,127 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+const STATUSES = [
+  { key: "recue", label: "Reçue" },
+  { key: "en_preparation", label: "En préparation" },
+  { key: "en_livraison", label: "En livraison" },
+  { key: "livree", label: "Livrée" },
+];
+
+export default function LivreurControls({
+  orderId,
+  initialStatus,
+}: {
+  orderId: string;
+  initialStatus: string;
+}) {
+  const [status, setStatus] = useState(initialStatus);
+  const [updating, setUpdating] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const watchId = useRef<number | null>(null);
+
+  const updateStatus = async (next: string) => {
+    setUpdating(true);
+    const res = await fetch(`/api/commandes/${orderId}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: next }),
+    });
+    setUpdating(false);
+    if (res.ok) setStatus(next);
+  };
+
+  const sendPosition = (position: GeolocationPosition) => {
+    fetch(`/api/commandes/${orderId}/position`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      }),
+    });
+  };
+
+  const toggleSharing = () => {
+    if (sharing) {
+      if (watchId.current !== null) {
+        navigator.geolocation.clearWatch(watchId.current);
+        watchId.current = null;
+      }
+      setSharing(false);
+      return;
+    }
+
+    if (!("geolocation" in navigator)) {
+      setGeoError("Géolocalisation non disponible sur cet appareil");
+      return;
+    }
+
+    setGeoError(null);
+    watchId.current = navigator.geolocation.watchPosition(
+      sendPosition,
+      () => setGeoError("Impossible d'accéder à la position"),
+      { enableHighAccuracy: true, maximumAge: 5000 },
+    );
+    setSharing(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (watchId.current !== null) {
+        navigator.geolocation.clearWatch(watchId.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="mt-6 flex flex-col gap-4">
+      <div className="rounded-xl border border-brand/10 p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+          Statut
+        </h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {STATUSES.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              disabled={updating || s.key === status}
+              onClick={() => updateStatus(s.key)}
+              className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-colors disabled:opacity-50 ${
+                s.key === status
+                  ? "bg-brand text-white"
+                  : "border border-brand/20 text-brand hover:bg-cream"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-brand/10 p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+          Position en direct
+        </h2>
+        <p className="mt-2 text-sm text-brand/60">
+          Active le partage pendant la livraison, le client voit ta position sur sa
+          page de suivi.
+        </p>
+        <button
+          type="button"
+          onClick={toggleSharing}
+          className={`mt-3 w-full rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition-colors ${
+            sharing
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-brand text-white hover:bg-brand-soft"
+          }`}
+        >
+          {sharing ? "Arrêter le partage" : "Partager ma position"}
+        </button>
+        {geoError && <p className="mt-2 text-sm text-red-600">{geoError}</p>}
+      </div>
+    </div>
+  );
+}

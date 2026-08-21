@@ -13,12 +13,19 @@ interface OrderRow {
   id: string;
   order_number: number;
   customer_name: string;
+  customer_email: string | null;
   customer_phone: string;
   delivery_address: string;
   delivery_note: string | null;
   total_price: number;
   status: string;
+  payment_method: string;
 }
+
+const PAYMENT_LABELS: Record<string, string> = {
+  cb: "Carte bancaire à la livraison",
+  especes: "Espèces à la livraison",
+};
 
 export default async function ConfirmationPage(
   props: PageProps<"/commande/confirmation/[id]">,
@@ -29,7 +36,7 @@ export default async function ConfirmationPage(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, delivery_address, delivery_note, total_price, status",
+      "id, order_number, customer_name, customer_email, customer_phone, delivery_address, delivery_note, total_price, status, payment_method",
     )
     .eq("id", id)
     .single<OrderRow>();
@@ -52,7 +59,8 @@ export default async function ConfirmationPage(
           Commande confirmée
         </h1>
         <p className="mt-1 text-sm text-brand/60">
-          Commande n° {order.order_number} — paiement à la livraison
+          Commande n° {order.order_number} —{" "}
+          {PAYMENT_LABELS[order.payment_method] ?? order.payment_method}
         </p>
       </div>
 
@@ -85,6 +93,9 @@ export default async function ConfirmationPage(
           Livraison
         </h2>
         <p className="mt-2 text-sm text-brand">{order.customer_name}</p>
+        {order.customer_email && (
+          <p className="text-sm text-brand/70">{order.customer_email}</p>
+        )}
         <p className="text-sm text-brand/70">{order.customer_phone}</p>
         <p className="text-sm text-brand/70">{order.delivery_address}</p>
         {order.delivery_note && (
@@ -94,14 +105,12 @@ export default async function ConfirmationPage(
         )}
       </div>
 
-      <button
-        type="button"
-        disabled
-        title="Disponible au Lot 3 (suivi GPS)"
-        className="mt-6 w-full cursor-not-allowed rounded-full bg-brand/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-brand/40"
+      <Link
+        href={`/commande/suivi/${order.id}`}
+        className="mt-6 block w-full rounded-full bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
       >
-        Suivre ma commande — bientôt
-      </button>
+        Suivre ma commande
+      </Link>
 
       <Link
         href="/commande"
