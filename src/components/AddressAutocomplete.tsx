@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 interface Suggestion {
-  label: string;
+  streetLine: string;
+  postalCode: string;
+  city: string;
   lat: number;
   lng: number;
 }
@@ -16,10 +18,7 @@ export default function AddressAutocomplete({
 }: {
   value: string;
   onChange: (value: string) => void;
-  onSelect: (
-    point: { lat: number; lng: number } | null,
-    postalCode?: string,
-  ) => void;
+  onSelect: (suggestion: Suggestion | null) => void;
   placeholder?: string;
 }) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -55,9 +54,8 @@ export default function AddressAutocomplete({
   }, []);
 
   const pick = (suggestion: Suggestion) => {
-    const postalCode = suggestion.label.match(/\b\d{5}\b/)?.[0];
-    onChange(suggestion.label);
-    onSelect({ lat: suggestion.lat, lng: suggestion.lng }, postalCode);
+    onChange(suggestion.streetLine);
+    onSelect(suggestion);
     setOpen(false);
     setSuggestions([]);
   };
@@ -87,26 +85,32 @@ export default function AddressAutocomplete({
             setOpen(false);
           }
         }}
-        placeholder={placeholder ?? "Numéro, rue, ville"}
+        placeholder={placeholder ?? "Numéro et rue"}
         autoComplete="off"
         className="w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
       />
-      {open && suggestions.length > 0 && (
+      {open && (
         <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-brand/10 bg-white shadow-lg">
-          {suggestions.map((s, i) => (
-            <li key={`${s.lat}-${s.lng}`}>
-              <button
-                type="button"
-                onClick={() => pick(s)}
-                onMouseEnter={() => setHighlighted(i)}
-                className={`block w-full px-4 py-2 text-left text-sm text-brand ${
-                  i === highlighted ? "bg-cream" : "hover:bg-cream"
-                }`}
-              >
-                {s.label}
-              </button>
+          {suggestions.length > 0 ? (
+            suggestions.map((s, i) => (
+              <li key={`${s.lat}-${s.lng}`}>
+                <button
+                  type="button"
+                  onClick={() => pick(s)}
+                  onMouseEnter={() => setHighlighted(i)}
+                  className={`block w-full px-4 py-2 text-left text-sm text-brand ${
+                    i === highlighted ? "bg-cream" : "hover:bg-cream"
+                  }`}
+                >
+                  {s.streetLine}, {s.postalCode} {s.city}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="px-4 py-2 text-sm text-brand/50">
+              Aucune adresse trouvée en Île-de-France
             </li>
-          ))}
+          )}
         </ul>
       )}
     </div>

@@ -12,8 +12,23 @@ import {
   formatSlotLabel,
   getReturnTimeLabel,
 } from "@/lib/deliverySlots";
+import {
+  COUNTRY_OPTIONS,
+  DEFAULT_COUNTRY,
+  formatNationalNumber,
+  formatPhoneForStorage,
+  isValidNationalNumber,
+} from "@/lib/phone";
 
 type PaymentMethod = "cb" | "especes";
+
+interface AddressSelection {
+  streetLine: string;
+  postalCode: string;
+  city: string;
+  lat: number;
+  lng: number;
+}
 
 export default function LivraisonPage() {
   const router = useRouter();
@@ -22,10 +37,10 @@ export default function LivraisonPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [addressPoint, setAddressPoint] = useState<{ lat: number; lng: number } | null>(
+  const [dialCode, setDialCode] = useState(DEFAULT_COUNTRY.dialCode);
+  const [phoneDigits, setPhoneDigits] = useState("");
+  const [street, setStreet] = useState("");
+  const [addressSelection, setAddressSelection] = useState<AddressSelection | null>(
     null,
   );
   const [note, setNote] = useState("");
@@ -39,6 +54,16 @@ export default function LivraisonPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!isValidNationalNumber(dialCode, phoneDigits)) {
+      setError("Numéro de téléphone invalide pour le pays sélectionné");
+      return;
+    }
+    if (!addressSelection) {
+      setError("Choisis une adresse dans la liste proposée (livraison en Île-de-France uniquement)");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -49,9 +74,11 @@ export default function LivraisonPage() {
           customer: {
             name: `${firstName.trim()} ${lastName.trim()}`.trim(),
             email,
-            phone,
-            address: `${address.trim()}, ${postalCode.trim()}`,
-            addressPoint,
+            phone: formatPhoneForStorage(dialCode, phoneDigits),
+            street: addressSelection.streetLine,
+            postalCode: addressSelection.postalCode,
+            city: addressSelection.city,
+            addressPoint: { lat: addressSelection.lat, lng: addressSelection.lng },
             note,
             paymentMethod,
             deliverySlot,
@@ -192,13 +219,28 @@ export default function LivraisonPage() {
           <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
             Téléphone
           </label>
-          <input
-            required
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
-          />
+          <div className="mt-1 flex gap-2">
+            <select
+              value={dialCode}
+              onChange={(e) => setDialCode(e.target.value)}
+              className="rounded-lg border border-brand/20 bg-white px-2 py-2.5 text-sm text-brand"
+            >
+              {COUNTRY_OPTIONS.map((c) => (
+                <option key={c.code} value={c.dialCode}>
+                  {c.flag} +{c.dialCode}
+                </option>
+              ))}
+            </select>
+            <input
+              required
+              type="tel"
+              inputMode="numeric"
+              value={formatNationalNumber(phoneDigits)}
+              onChange={(e) => setPhoneDigits(e.target.value.replace(/\D/g, ""))}
+              placeholder="6 12 34 56 78"
+              className="w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            />
+          </div>
         </div>
 
         <div>
@@ -207,35 +249,45 @@ export default function LivraisonPage() {
           </label>
           <div className="mt-1">
             <AddressAutocomplete
-              value={address}
-              onChange={setAddress}
-              onSelect={(point, suggestedPostalCode) => {
-                setAddressPoint(point);
-                if (suggestedPostalCode) setPostalCode(suggestedPostalCode);
+              value={street}
+              onChange={(value) => {
+                setStreet(value);
+                setAddressSelection(null);
               }}
+              onSelect={setAddressSelection}
               placeholder="Numéro et rue"
             />
           </div>
           <p className="mt-1 text-xs text-brand/40">
-            Choisis une adresse dans la liste proposée pour garantir la localisation.
+            Choisis une adresse dans la liste proposée — livraison en Île-de-France
+            uniquement.
           </p>
         </div>
 
-        <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
-            Code postal
-          </label>
-          <input
-            required
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            inputMode="numeric"
-            pattern="\d{5}"
-            maxLength={5}
-            placeholder="91200"
-            className="mt-1 w-32 rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
-          />
-        </div>
+        {addressSelection && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+                Code postal
+              </label>
+              <input
+                readOnly
+                value={addressSelection.postalCode}
+                className="mt-1 w-full rounded-lg border border-brand/10 bg-cream px-4 py-2.5 text-sm text-brand/70"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+                Ville
+              </label>
+              <input
+                readOnly
+                value={addressSelection.city}
+                className="mt-1 w-full rounded-lg border border-brand/10 bg-cream px-4 py-2.5 text-sm text-brand/70"
+              />
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">

@@ -1,9 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isInIleDeFrance } from "@/lib/deliveryZones";
 
-interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
+interface BanFeature {
+  properties: {
+    label: string;
+    housenumber?: string;
+    street?: string;
+    name: string;
+    postcode: string;
+    city: string;
+    type: string;
+  };
+  geometry: {
+    coordinates: [number, number];
+  };
+}
+
+interface BanResponse {
+  features: BanFeature[];
+}
+
+export interface AddressSuggestion {
+  streetLine: string;
+  postalCode: string;
+  city: string;
+  lat: number;
+  lng: number;
 }
 
 export async function GET(request: NextRequest) {
@@ -13,28 +35,32 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = new URL("https://nominatim.openstreetmap.org/search");
+    const url = new URL("https://api-adresse.data.gouv.fr/search/");
     url.searchParams.set("q", q);
-    url.searchParams.set("format", "jsonv2");
-    url.searchParams.set("limit", "5");
-    url.searchParams.set("countrycodes", "fr");
+    url.searchParams.set("limit", "10");
+    url.searchParams.set("type", "housenumber");
 
-    const res = await fetch(url, {
-      headers: { "User-Agent": "smoak-paris/1.0 (commande en ligne)" },
-      signal: AbortSignal.timeout(5000),
-    });
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) {
       return NextResponse.json({ suggestions: [] });
     }
 
-    const results: NominatimResult[] = await res.json();
-    return NextResponse.json({
-      suggestions: results.map((r) => ({
-        label: r.display_name,
-        lat: parseFloat(r.lat),
-        lng: parseFloat(r.lon),
-      })),
-    });
+    const data: BanResponse = await res.json();
+
+    const suggestions: AddressSuggestion[] = data.features
+      .filter((f) => isInIleDeFrance(f.properties.postcode))
+      .map((f) => ({
+        streetLine:
+          [f.properties.housenumber, f.properties.street].filter(Boolean).join(" ") ||
+          f.properties.name,
+        postalCode: f.properties.postcode,
+        city: f.properties.city,
+        lat: f.geometry.coordinates[1],
+        lng: f.geometry.coordinates[0],
+      }))
+      .slice(0, 5);
+
+    return NextResponse.json({ suggestions });
   } catch {
     return NextResponse.json({ suggestions: [] });
   }
