@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Cinzel } from "next/font/google";
 import { useEffect, useState } from "react";
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+});
 
 const NAV_LINKS = [
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
@@ -65,7 +71,7 @@ export default function Header() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-brand/10 px-5 py-5">
-          <span className="font-serif text-lg font-semibold tracking-tight text-brand">
+          <span className={`${cinzel.className} text-lg tracking-wide text-brand`}>
             Menu
           </span>
           <button
@@ -84,7 +90,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 font-serif text-lg text-brand/80 transition-colors hover:bg-cream hover:text-brand"
+              className={`${cinzel.className} rounded-lg px-3 py-3 text-base tracking-wide text-brand/80 transition-colors hover:bg-cream hover:text-brand`}
             >
               {link.label}
             </Link>

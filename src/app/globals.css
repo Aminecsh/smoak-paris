@@ -8,8 +8,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-body);
-  --font-serif: var(--font-display);
+  --font-sans: var(--font-montserrat);
+  --font-serif: var(--font-archivo);
 
   --color-brand: #2b1810;
   --color-brand-soft: #43291b;
@@ -23,15 +23,10 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 22s linear infinite;
+/* Hors des layers Tailwind pour primer sur les utilitaires de poids/tracking
+   posés à côté (ex: font-serif font-semibold) — c'est voulu : les grands
+   titres doivent rester en 400 avec ce tracking serré. */
+.font-serif {
+  font-weight: 400;
+  letter-spacing: -0.03em;
 }
