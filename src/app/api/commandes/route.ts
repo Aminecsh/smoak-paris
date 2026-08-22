@@ -9,6 +9,8 @@ import {
   type OrderItemInput,
 } from "@/lib/orderBuilder";
 import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
+import { sendPushToAll } from "@/lib/notifications/push";
+import { formatOrderReference } from "@/lib/orderNumber";
 
 interface OrderPayload {
   customer: {
@@ -149,6 +151,12 @@ export async function POST(request: NextRequest) {
       notification_error: notification.error ?? null,
     })
     .eq("id", order.id);
+
+  await sendPushToAll({
+    title: "Nouvelle commande",
+    body: `${formatOrderReference(order.order_number)} — ${totalPrice.toFixed(2)} €`,
+    url: `/livreur/${order.id}`,
+  });
 
   return NextResponse.json(
     {

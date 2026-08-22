@@ -4,6 +4,7 @@ import { isValidStockSession, STOCK_COOKIE_NAME } from "@/lib/stockAuth";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import StockLogin from "@/components/StockLogin";
 import { formatOrderReference } from "@/lib/orderNumber";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
 
 const STATUS_LABELS: Record<string, string> = {
   recue: "Reçue",
@@ -44,7 +45,11 @@ export default async function LivreurPage() {
         {orders?.length ?? 0} commande(s) à traiter.
       </p>
 
-      <ul className="mt-6 flex flex-col gap-3">
+      <div className="mt-4">
+        <PushSubscribeButton />
+      </div>
+
+      <ul className="mt-2 flex flex-col gap-3">
         {(orders ?? []).map((order) => (
           <li key={order.id}>
             <Link

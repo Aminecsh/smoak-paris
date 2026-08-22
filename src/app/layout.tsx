@@ -20,6 +20,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Smoak Paris — Chicha à domicile",
   description: "Chicha premium livrée chez vous à Paris.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
