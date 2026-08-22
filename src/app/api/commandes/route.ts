@@ -11,6 +11,7 @@ import {
 } from "@/lib/chicha";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { geocodeAddress } from "@/lib/geocode";
+import { isDeliverySlot } from "@/lib/deliverySlots";
 
 interface OrderItemInput {
   productId: string;
@@ -37,6 +38,7 @@ interface OrderPayload {
     addressPoint?: { lat: number; lng: number } | null;
     note?: string;
     paymentMethod?: string;
+    deliverySlot?: string;
   };
   items: OrderItemInput[];
   configuredChichas: ConfiguredChichaInput[];
@@ -201,7 +203,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const { name, email, phone, address, addressPoint, paymentMethod } =
+  const { name, email, phone, address, addressPoint, paymentMethod, deliverySlot } =
     payload.customer ?? {};
   if (!name?.trim() || !email?.trim() || !phone?.trim() || !address?.trim()) {
     return NextResponse.json(
@@ -211,6 +213,9 @@ export async function POST(request: NextRequest) {
   }
   if (paymentMethod && !VALID_PAYMENT_METHODS.includes(paymentMethod)) {
     return NextResponse.json({ error: "Moyen de paiement invalide" }, { status: 400 });
+  }
+  if (!isDeliverySlot(deliverySlot)) {
+    return NextResponse.json({ error: "Créneau de livraison invalide" }, { status: 400 });
   }
 
   const built = buildOrder(payload);
@@ -245,6 +250,7 @@ export async function POST(request: NextRequest) {
     p_delivery_lng: geo?.lng ?? null,
     p_customer_email: email.trim(),
     p_payment_method: paymentMethod ?? "especes",
+    p_delivery_slot: deliverySlot,
   });
 
   if (error) {

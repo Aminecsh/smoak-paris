@@ -6,6 +6,12 @@ import Link from "next/link";
 import { products } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import {
+  DELIVERY_SLOTS,
+  LAST_RETURN_LABEL,
+  formatSlotLabel,
+  getReturnTimeLabel,
+} from "@/lib/deliverySlots";
 
 type PaymentMethod = "cb" | "especes";
 
@@ -23,6 +29,7 @@ export default function LivraisonPage() {
     null,
   );
   const [note, setNote] = useState("");
+  const [deliverySlot, setDeliverySlot] = useState<string>(DELIVERY_SLOTS[0]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("especes");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +54,7 @@ export default function LivraisonPage() {
             addressPoint,
             note,
             paymentMethod,
+            deliverySlot,
           },
           items: items.map((item) => ({
             productId: item.productId,
@@ -227,6 +235,39 @@ export default function LivraisonPage() {
             placeholder="91200"
             className="mt-1 w-32 rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
           />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            Créneau de livraison
+          </label>
+          <div className="mt-1 grid grid-cols-4 gap-2">
+            {DELIVERY_SLOTS.map((slot) => (
+              <label
+                key={slot}
+                className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
+                  deliverySlot === slot
+                    ? "border-brand bg-cream text-brand"
+                    : "border-brand/20 text-brand/70"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="deliverySlot"
+                  value={slot}
+                  checked={deliverySlot === slot}
+                  onChange={() => setDeliverySlot(slot)}
+                  className="sr-only"
+                />
+                {formatSlotLabel(slot)}
+              </label>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-brand/40">
+            La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
+            {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
+            {LAST_RETURN_LABEL}).
+          </p>
         </div>
 
         <div>

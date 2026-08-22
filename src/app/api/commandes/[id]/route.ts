@@ -9,6 +9,7 @@ interface TrackedOrder {
   driver_lat: number | null;
   driver_lng: number | null;
   driver_updated_at: string | null;
+  delivery_slot: string | null;
 }
 
 // Endpoint public (id = UUID non devinable) : uniquement les infos utiles au
@@ -23,7 +24,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "order_number, status, delivery_lat, delivery_lng, driver_lat, driver_lng, driver_updated_at",
+      "order_number, status, delivery_lat, delivery_lng, driver_lat, driver_lng, driver_updated_at, delivery_slot",
     )
     .eq("id", id)
     .single<TrackedOrder>();
@@ -35,6 +36,7 @@ export async function GET(
   return NextResponse.json({
     orderNumber: data.order_number,
     status: data.status,
+    deliverySlot: data.delivery_slot,
     delivery:
       data.delivery_lat != null && data.delivery_lng != null
         ? { lat: data.delivery_lat, lng: data.delivery_lng }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { formatSlotLabel, getReturnTimeLabel } from "@/lib/deliverySlots";
 
 interface OrderItemRow {
   id: string;
@@ -20,6 +21,7 @@ interface OrderRow {
   total_price: number;
   status: string;
   payment_method: string;
+  delivery_slot: string | null;
 }
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -36,7 +38,7 @@ export default async function ConfirmationPage(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_email, customer_phone, delivery_address, delivery_note, total_price, status, payment_method",
+      "id, order_number, customer_name, customer_email, customer_phone, delivery_address, delivery_note, total_price, status, payment_method, delivery_slot",
     )
     .eq("id", id)
     .single<OrderRow>();
@@ -98,6 +100,12 @@ export default async function ConfirmationPage(
         )}
         <p className="text-sm text-brand/70">{order.customer_phone}</p>
         <p className="text-sm text-brand/70">{order.delivery_address}</p>
+        {order.delivery_slot && (
+          <p className="mt-2 text-sm text-brand/70">
+            Créneau : {formatSlotLabel(order.delivery_slot)} — chicha à rendre
+            avant {getReturnTimeLabel(order.delivery_slot)}
+          </p>
+        )}
         {order.delivery_note && (
           <p className="mt-2 text-xs text-brand/50">
             Note : {order.delivery_note}

@@ -4,6 +4,12 @@ import { use, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import OrderStatusStepper from "@/components/OrderStatusStepper";
+import { getReturnTimeLabel } from "@/lib/deliverySlots";
+
+// Numéro provisoire à contacter pour organiser la reprise de la chicha —
+// sera remplacé par le vrai numéro du service.
+const RETURN_PHONE_NUMBER = "0600000000";
+const RETURN_PHONE_DISPLAY = "06 00 00 00 00";
 
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
   ssr: false,
@@ -17,6 +23,7 @@ interface Point {
 interface TrackingData {
   orderNumber: number;
   status: string;
+  deliverySlot: string | null;
   delivery: Point | null;
   driver: (Point & { updatedAt: string | null }) | null;
 }
@@ -103,9 +110,22 @@ export default function SuiviPage({
       )}
 
       {data.status === "livree" && (
-        <p className="mt-6 text-center text-sm text-brand/60">
-          Votre commande a été livrée. Bon moment ✨
-        </p>
+        <div className="mt-6 rounded-xl border border-brand/10 bg-cream p-5 text-center">
+          <p className="text-sm text-brand/60">
+            Votre commande a été livrée. Bon moment ✨
+          </p>
+          {data.deliverySlot && (
+            <p className="mt-2 text-sm font-medium text-brand">
+              Votre chicha doit être rendue à {getReturnTimeLabel(data.deliverySlot)}.
+            </p>
+          )}
+          <a
+            href={`tel:${RETURN_PHONE_NUMBER}`}
+            className="mt-4 inline-block w-full rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+          >
+            Je veux la rendre maintenant — {RETURN_PHONE_DISPLAY}
+          </a>
+        </div>
       )}
 
       <Link
