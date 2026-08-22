@@ -1,40 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { products } from "@/lib/products";
-import {
-  chichaBases,
-  chichaFlavors,
-  rechargeSupplement,
-  charcoalSupplement,
-  extraFlavorSupplement,
-  drinkSupplements,
-  sweetSupplements,
-} from "@/lib/chicha";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { geocodeAddress } from "@/lib/geocode";
 import { isDeliverySlot } from "@/lib/deliverySlots";
-
-interface OrderItemInput {
-  productId: string;
-  quantity: number;
-}
-
-interface ConfiguredChichaInput {
-  chichaId: string;
-  flavorId: string;
-  recharge?: boolean;
-  extraCharcoal?: boolean;
-  extraFlavorId?: string | null;
-  drinkIds?: string[];
-  sweetIds?: string[];
-  quantity: number;
-}
+import { getDeliveryZone, isInIleDeFrance } from "@/lib/deliveryZones";
+import {
+  buildOrder,
+  type ConfiguredChichaInput,
+  type OrderItemInput,
+} from "@/lib/orderBuilder";
+import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
 
 interface OrderPayload {
   customer: {
     name: string;
     email: string;
     phone: string;
-    address: string;
+    street: string;
+    postalCode: string;
+    city: string;
     addressPoint?: { lat: number; lng: number } | null;
     note?: string;
     paymentMethod?: string;
@@ -45,155 +28,8 @@ interface OrderPayload {
 }
 
 const VALID_PAYMENT_METHODS = ["cb", "especes"];
-
-interface OrderItemRow {
-  kind: "produit" | "chicha";
-  name: string;
-  unit_price: number;
-  quantity: number;
-  details: Record<string, unknown> | null;
-}
-
-interface StockDecrement {
-  id: string;
-  name: string;
-  quantity: number;
-}
-
-interface BuiltOrder {
-  itemRows: OrderItemRow[];
-  stockDecrements: StockDecrement[];
-}
-
-function isPositiveInt(value: unknown): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value > 0;
-}
-
-// Reconstruit les lignes de commande et les décomptes de stock à partir du
-// catalogue serveur — on ne fait jamais confiance aux prix envoyés par le
-// client.
-function buildOrder(payload: OrderPayload): BuiltOrder | { error: string } {
-  const itemRows: OrderItemRow[] = [];
-  const stockDecrements: StockDecrement[] = [];
-
-  for (const item of payload.items ?? []) {
-    if (!isPositiveInt(item.quantity)) {
-      return { error: `Quantité invalide pour ${item.productId}` };
-    }
-    const product = products.find((p) => p.id === item.productId);
-    if (!product) {
-      return { error: `Produit inconnu : ${item.productId}` };
-    }
-    itemRows.push({
-      kind: "produit",
-      name: product.name,
-      unit_price: product.price,
-      quantity: item.quantity,
-      details: null,
-    });
-    stockDecrements.push({
-      id: product.id,
-      name: product.name,
-      quantity: item.quantity,
-    });
-  }
-
-  for (const chicha of payload.configuredChichas ?? []) {
-    if (!isPositiveInt(chicha.quantity)) {
-      return { error: "Quantité de chicha invalide" };
-    }
-    const base = chichaBases.find((c) => c.id === chicha.chichaId);
-    if (!base) {
-      return { error: `Chicha inconnue : ${chicha.chichaId}` };
-    }
-    const flavor = chichaFlavors.find((f) => f.id === chicha.flavorId);
-    if (!flavor) {
-      return { error: `Goût inconnu : ${chicha.flavorId}` };
-    }
-    const extraFlavor = chicha.extraFlavorId
-      ? chichaFlavors.find((f) => f.id === chicha.extraFlavorId)
-      : null;
-    const drinks = (chicha.drinkIds ?? []).map((id) =>
-      drinkSupplements.find((d) => d.id === id),
-    );
-    if (drinks.some((d) => !d)) {
-      return { error: "Boisson en supplément inconnue" };
-    }
-    const sweets = (chicha.sweetIds ?? []).map((id) =>
-      sweetSupplements.find((s) => s.id === id),
-    );
-    if (sweets.some((s) => !s)) {
-      return { error: "Sucrerie en supplément inconnue" };
-    }
-
-    const unitPrice =
-      base.price +
-      (chicha.recharge ? rechargeSupplement.price : 0) +
-      (chicha.extraCharcoal ? charcoalSupplement.price : 0) +
-      (extraFlavor ? extraFlavorSupplement.price : 0) +
-      drinks.reduce((sum, d) => sum + (d?.price ?? 0), 0) +
-      sweets.reduce((sum, s) => sum + (s?.price ?? 0), 0);
-
-    itemRows.push({
-      kind: "chicha",
-      name: `${base.name} — ${flavor.name}`,
-      unit_price: unitPrice,
-      quantity: chicha.quantity,
-      details: {
-        flavor: flavor.name,
-        recharge: Boolean(chicha.recharge),
-        extraCharcoal: Boolean(chicha.extraCharcoal),
-        extraFlavor: extraFlavor?.name ?? null,
-        drinks: drinks.map((d) => d!.name),
-        sweets: sweets.map((s) => s!.name),
-      },
-    });
-
-    stockDecrements.push({ id: base.id, name: base.name, quantity: chicha.quantity });
-    stockDecrements.push({ id: flavor.id, name: flavor.name, quantity: chicha.quantity });
-    if (extraFlavor) {
-      stockDecrements.push({
-        id: extraFlavor.id,
-        name: extraFlavor.name,
-        quantity: chicha.quantity,
-      });
-    }
-    if (chicha.recharge) {
-      stockDecrements.push({
-        id: rechargeSupplement.id,
-        name: rechargeSupplement.name,
-        quantity: chicha.quantity,
-      });
-    }
-    if (chicha.extraCharcoal) {
-      stockDecrements.push({
-        id: charcoalSupplement.id,
-        name: charcoalSupplement.name,
-        quantity: chicha.quantity,
-      });
-    }
-    for (const drink of drinks) {
-      stockDecrements.push({
-        id: drink!.id,
-        name: drink!.name,
-        quantity: chicha.quantity,
-      });
-    }
-    for (const sweet of sweets) {
-      stockDecrements.push({
-        id: sweet!.id,
-        name: sweet!.name,
-        quantity: chicha.quantity,
-      });
-    }
-  }
-
-  if (itemRows.length === 0) {
-    return { error: "Le panier est vide" };
-  }
-
-  return { itemRows, stockDecrements };
-}
+const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
+const POSTAL_CODE_PATTERN = /^\d{5}$/;
 
 export async function POST(request: NextRequest) {
   let payload: OrderPayload;
@@ -203,11 +39,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const { name, email, phone, address, addressPoint, paymentMethod, deliverySlot } =
+  const { name, email, phone, street, postalCode, city, addressPoint, paymentMethod, deliverySlot } =
     payload.customer ?? {};
-  if (!name?.trim() || !email?.trim() || !phone?.trim() || !address?.trim()) {
+  if (
+    !name?.trim() ||
+    !email?.trim() ||
+    !phone?.trim() ||
+    !street?.trim() ||
+    !postalCode?.trim() ||
+    !city?.trim()
+  ) {
     return NextResponse.json(
-      { error: "Nom, email, téléphone et adresse sont obligatoires" },
+      { error: "Nom, email, téléphone et adresse complète sont obligatoires" },
+      { status: 400 },
+    );
+  }
+  if (!PHONE_PATTERN.test(phone.trim())) {
+    return NextResponse.json({ error: "Numéro de téléphone invalide" }, { status: 400 });
+  }
+  if (!POSTAL_CODE_PATTERN.test(postalCode.trim())) {
+    return NextResponse.json({ error: "Code postal invalide" }, { status: 400 });
+  }
+  if (!isInIleDeFrance(postalCode.trim())) {
+    return NextResponse.json(
+      { error: "Nous livrons uniquement en Île-de-France" },
+      { status: 400 },
+    );
+  }
+  const deliveryZone = getDeliveryZone(postalCode.trim());
+  if (!deliveryZone) {
+    return NextResponse.json(
+      { error: "Impossible de déterminer le secteur de livraison" },
       { status: 400 },
     );
   }
@@ -234,14 +96,14 @@ export async function POST(request: NextRequest) {
   const geo =
     addressPoint && Number.isFinite(addressPoint.lat) && Number.isFinite(addressPoint.lng)
       ? addressPoint
-      : await geocodeAddress(address.trim());
+      : await geocodeAddress(`${street.trim()}, ${postalCode.trim()} ${city.trim()}`);
 
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase.rpc("create_order", {
     p_customer_name: name.trim(),
     p_customer_phone: phone.trim(),
-    p_delivery_address: address.trim(),
+    p_delivery_address: street.trim(),
     p_delivery_note: payload.customer.note?.trim() || null,
     p_total_price: totalPrice,
     p_order_items: itemRows,
@@ -251,6 +113,9 @@ export async function POST(request: NextRequest) {
     p_customer_email: email.trim(),
     p_payment_method: paymentMethod ?? "especes",
     p_delivery_slot: deliverySlot,
+    p_postal_code: postalCode.trim(),
+    p_city: city.trim(),
+    p_delivery_zone: deliveryZone,
   });
 
   if (error) {
@@ -269,8 +134,29 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const trackingUrl = `${request.nextUrl.origin}/commande/suivi/${order.id}`;
+  const notification = await sendTrackingLink({
+    firstName: name.trim().split(" ")[0],
+    phone: phone.trim(),
+    email: email.trim(),
+    trackingUrl,
+  });
+
+  await supabase
+    .from("orders")
+    .update({
+      notification_channel: notification.channel,
+      notification_error: notification.error ?? null,
+    })
+    .eq("id", order.id);
+
   return NextResponse.json(
-    { id: order.id, orderNumber: order.order_number, totalPrice },
+    {
+      id: order.id,
+      orderNumber: order.order_number,
+      totalPrice,
+      notificationChannel: notification.channel,
+    },
     { status: 201 },
   );
 }

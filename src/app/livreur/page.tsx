@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { isValidStockSession, STOCK_COOKIE_NAME } from "@/lib/stockAuth";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import StockLogin from "@/components/StockLogin";
+import { formatOrderReference } from "@/lib/orderNumber";
 
 const STATUS_LABELS: Record<string, string> = {
   recue: "Reçue",
@@ -52,7 +53,8 @@ export default async function LivreurPage() {
             >
               <div className="min-w-0">
                 <p className="font-serif font-semibold text-brand">
-                  Commande n° {order.order_number} — {order.customer_name}
+                  Commande n° {formatOrderReference(order.order_number)} —{" "}
+                  {order.customer_name}
                 </p>
                 <p className="truncate text-sm text-brand/60">
                   {order.delivery_address}

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { formatSlotLabel, getReturnTimeLabel } from "@/lib/deliverySlots";
+import { DELIVERY_ZONE_LABELS, type DeliveryZone } from "@/lib/deliveryZones";
+import { formatOrderReference } from "@/lib/orderNumber";
+import ResendTrackingLink from "@/components/ResendTrackingLink";
 
 interface OrderItemRow {
   id: string;
@@ -17,11 +20,15 @@ interface OrderRow {
   customer_email: string | null;
   customer_phone: string;
   delivery_address: string;
+  postal_code: string | null;
+  city: string | null;
+  delivery_zone: DeliveryZone | null;
   delivery_note: string | null;
   total_price: number;
   status: string;
   payment_method: string;
   delivery_slot: string | null;
+  notification_channel: "whatsapp" | "email" | "failed" | null;
 }
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -38,7 +45,7 @@ export default async function ConfirmationPage(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_email, customer_phone, delivery_address, delivery_note, total_price, status, payment_method, delivery_slot",
+      "id, order_number, customer_name, customer_email, customer_phone, delivery_address, postal_code, city, delivery_zone, delivery_note, total_price, status, payment_method, delivery_slot, notification_channel",
     )
     .eq("id", id)
     .single<OrderRow>();
@@ -61,7 +68,7 @@ export default async function ConfirmationPage(
           Commande confirmée
         </h1>
         <p className="mt-1 text-sm text-brand/60">
-          Commande n° {order.order_number} —{" "}
+          Commande n° {formatOrderReference(order.order_number)} —{" "}
           {PAYMENT_LABELS[order.payment_method] ?? order.payment_method}
         </p>
       </div>
@@ -99,7 +106,15 @@ export default async function ConfirmationPage(
           <p className="text-sm text-brand/70">{order.customer_email}</p>
         )}
         <p className="text-sm text-brand/70">{order.customer_phone}</p>
-        <p className="text-sm text-brand/70">{order.delivery_address}</p>
+        <ResendTrackingLink orderId={order.id} initialChannel={order.notification_channel} />
+        <p className="mt-2 text-sm text-brand/70">
+          {order.delivery_address}, {order.postal_code} {order.city}
+        </p>
+        {order.delivery_zone && (
+          <p className="text-xs text-brand/40">
+            Secteur : {DELIVERY_ZONE_LABELS[order.delivery_zone]}
+          </p>
+        )}
         {order.delivery_slot && (
           <p className="mt-2 text-sm text-brand/70">
             Créneau : {formatSlotLabel(order.delivery_slot)} — chicha à rendre

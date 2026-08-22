@@ -4,6 +4,9 @@ import { isValidStockSession, STOCK_COOKIE_NAME } from "@/lib/stockAuth";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import StockLogin from "@/components/StockLogin";
 import LivreurControls from "@/components/LivreurControls";
+import { formatOrderReference } from "@/lib/orderNumber";
+import { formatSlotLabel, getReturnTimeLabel } from "@/lib/deliverySlots";
+import { DELIVERY_ZONE_LABELS, type DeliveryZone } from "@/lib/deliveryZones";
 
 interface OrderItemRow {
   id: string;
@@ -21,6 +24,9 @@ interface OrderRow {
   total_price: number;
   status: string;
   payment_method: string;
+  delivery_zone: DeliveryZone | null;
+  delivery_slot: string | null;
+  early_return_slot: string | null;
 }
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -42,7 +48,7 @@ export default async function LivreurOrderPage(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, delivery_address, delivery_note, total_price, status, payment_method",
+      "id, order_number, customer_name, customer_phone, delivery_address, delivery_note, total_price, status, payment_method, delivery_zone, delivery_slot, early_return_slot",
     )
     .eq("id", id)
     .single<OrderRow>();
@@ -60,15 +66,27 @@ export default async function LivreurOrderPage(
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
       <h1 className="font-serif text-2xl font-semibold text-brand">
-        Commande n° {order.order_number}
+        Commande n° {formatOrderReference(order.order_number)}
       </h1>
 
       <div className="mt-4 rounded-xl border border-brand/10 bg-cream p-5">
         <p className="text-sm font-medium text-brand">{order.customer_name}</p>
         <p className="text-sm text-brand/70">{order.customer_phone}</p>
         <p className="text-sm text-brand/70">{order.delivery_address}</p>
+        {order.delivery_zone && (
+          <p className="mt-1 text-xs text-brand/40">
+            Secteur : {DELIVERY_ZONE_LABELS[order.delivery_zone]}
+          </p>
+        )}
         {order.delivery_note && (
           <p className="mt-2 text-xs text-brand/50">Note : {order.delivery_note}</p>
+        )}
+        {order.delivery_slot && (
+          <p className="mt-2 text-sm font-medium text-brand">
+            {order.early_return_slot
+              ? `Reprise anticipée demandée à ${formatSlotLabel(order.early_return_slot)}`
+              : `Reprise prévue à ${getReturnTimeLabel(order.delivery_slot)}`}
+          </p>
         )}
       </div>
 

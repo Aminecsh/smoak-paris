@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import type { DeliveryZone } from "@/lib/deliveryZones";
 
 interface TrackedOrder {
   order_number: number;
@@ -10,6 +11,8 @@ interface TrackedOrder {
   driver_lng: number | null;
   driver_updated_at: string | null;
   delivery_slot: string | null;
+  delivery_zone: DeliveryZone | null;
+  early_return_slot: string | null;
 }
 
 // Endpoint public (id = UUID non devinable) : uniquement les infos utiles au
@@ -24,7 +27,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "order_number, status, delivery_lat, delivery_lng, driver_lat, driver_lng, driver_updated_at, delivery_slot",
+      "order_number, status, delivery_lat, delivery_lng, driver_lat, driver_lng, driver_updated_at, delivery_slot, delivery_zone, early_return_slot",
     )
     .eq("id", id)
     .single<TrackedOrder>();
@@ -37,6 +40,8 @@ export async function GET(
     orderNumber: data.order_number,
     status: data.status,
     deliverySlot: data.delivery_slot,
+    deliveryZone: data.delivery_zone,
+    earlyReturnSlot: data.early_return_slot,
     delivery:
       data.delivery_lat != null && data.delivery_lng != null
         ? { lat: data.delivery_lat, lng: data.delivery_lng }
