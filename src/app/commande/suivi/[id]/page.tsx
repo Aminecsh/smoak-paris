@@ -5,11 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import OrderStatusStepper from "@/components/OrderStatusStepper";
 import { getReturnTimeLabel } from "@/lib/deliverySlots";
-
-// Numéro provisoire à contacter pour organiser la reprise de la chicha —
-// sera remplacé par le vrai numéro du service.
-const RETURN_PHONE_NUMBER = "0600000000";
-const RETURN_PHONE_DISPLAY = "06 00 00 00 00";
+import { SERVICE_PHONE_NUMBER, SERVICE_PHONE_DISPLAY } from "@/lib/contact";
 
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
   ssr: false,
@@ -120,10 +116,10 @@ export default function SuiviPage({
             </p>
           )}
           <a
-            href={`tel:${RETURN_PHONE_NUMBER}`}
+            href={`tel:${SERVICE_PHONE_NUMBER}`}
             className="mt-4 inline-block w-full rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
           >
-            Je veux la rendre maintenant — {RETURN_PHONE_DISPLAY}
+            Je veux la rendre maintenant — {SERVICE_PHONE_DISPLAY}
           </a>
         </div>
       )}
