@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 
@@ -16,11 +17,15 @@ export default function Header() {
           Menu
         </Link>
 
-        <Link
-          href="/"
-          className="justify-self-center font-serif text-xl font-semibold tracking-tight text-brand sm:text-2xl"
-        >
-          Smoak <span className="italic">Paris</span>
+        <Link href="/" className="justify-self-center">
+          <Image
+            src="/logo.png"
+            alt="Smoak Paris"
+            width={936}
+            height={491}
+            priority
+            className="h-10 w-auto sm:h-12"
+          />
         </Link>
 
         <Link
