@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import type { DeliveryZone } from "@/lib/deliveryZones";
+import { getDrivingRoute } from "@/lib/routing";
 
 interface TrackedOrder {
   order_number: number;
@@ -36,23 +37,28 @@ export async function GET(
     return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
   }
 
+  const delivery =
+    data.delivery_lat != null && data.delivery_lng != null
+      ? { lat: data.delivery_lat, lng: data.delivery_lng }
+      : null;
+  const driver =
+    data.driver_lat != null && data.driver_lng != null
+      ? { lat: data.driver_lat, lng: data.driver_lng, updatedAt: data.driver_updated_at }
+      : null;
+
+  const route =
+    data.status === "en_livraison" && driver && delivery
+      ? await getDrivingRoute(driver, delivery)
+      : null;
+
   return NextResponse.json({
     orderNumber: data.order_number,
     status: data.status,
     deliverySlot: data.delivery_slot,
     deliveryZone: data.delivery_zone,
     earlyReturnSlot: data.early_return_slot,
-    delivery:
-      data.delivery_lat != null && data.delivery_lng != null
-        ? { lat: data.delivery_lat, lng: data.delivery_lng }
-        : null,
-    driver:
-      data.driver_lat != null && data.driver_lng != null
-        ? {
-            lat: data.driver_lat,
-            lng: data.driver_lng,
-            updatedAt: data.driver_updated_at,
-          }
-        : null,
+    delivery,
+    driver,
+    route,
   });
 }

@@ -27,6 +27,12 @@ interface Point {
   lng: number;
 }
 
+interface RouteInfo {
+  distanceMeters: number;
+  durationSeconds: number;
+  geometry: [number, number][];
+}
+
 interface TrackingData {
   orderNumber: number;
   status: string;
@@ -35,6 +41,18 @@ interface TrackingData {
   earlyReturnSlot: string | null;
   delivery: Point | null;
   driver: (Point & { updatedAt: string | null }) | null;
+  route: RouteInfo | null;
+}
+
+function formatEta(durationSeconds: number): string {
+  const minutes = Math.max(1, Math.round(durationSeconds / 60));
+  return minutes === 1 ? "1 min" : `${minutes} min`;
+}
+
+function formatDistance(distanceMeters: number): string {
+  return distanceMeters < 1000
+    ? `${Math.round(distanceMeters)} m`
+    : `${(distanceMeters / 1000).toFixed(1)} km`;
 }
 
 const POLL_INTERVAL_MS = 5000;
@@ -152,7 +170,25 @@ export default function SuiviPage({
 
       {data.status === "en_livraison" && (
         <div className="mt-6">
-          <TrackingMap driver={data.driver} delivery={data.delivery} />
+          {data.route && (
+            <div className="mb-3 flex items-center justify-between rounded-xl bg-brand px-5 py-4 text-white">
+              <div>
+                <p className="text-xs uppercase tracking-[0.1em] text-white/70">
+                  Votre livreur arrive
+                </p>
+                <p className="mt-0.5 font-serif text-2xl">
+                  {formatEta(data.route.durationSeconds)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-[0.1em] text-white/70">Distance</p>
+                <p className="mt-0.5 font-mono text-lg">
+                  {formatDistance(data.route.distanceMeters)}
+                </p>
+              </div>
+            </div>
+          )}
+          <TrackingMap driver={data.driver} delivery={data.delivery} route={data.route?.geometry} />
           {!data.driver && (
             <p className="mt-2 text-center text-xs text-brand/50">
               En attente de la position du livreur...
