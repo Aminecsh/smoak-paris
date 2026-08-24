@@ -41,6 +41,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/85" />
       </section>
 
+      <div id="hero-sentinel" aria-hidden="true" className="h-px w-full" />
+
       <OrderTab />
 
       <a
