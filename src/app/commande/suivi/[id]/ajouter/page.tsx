@@ -65,7 +65,7 @@ export default function AjouterArticlesPage({
         </p>
         <Link
           href={`/commande/suivi/${id}`}
-          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
+          className="mt-6 inline-block rounded-lg bg-signal px-5 py-2.5 text-xs font-semibold text-white hover:bg-signal-hover"
         >
           Retour au suivi
         </Link>
@@ -116,7 +116,7 @@ export default function AjouterArticlesPage({
                         <button
                           type="button"
                           onClick={() => addOne(product.id)}
-                          className="flex-shrink-0 rounded-full border border-border bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-signal hover:text-white"
+                          className="flex-shrink-0 rounded-lg border border-border bg-white px-4 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-signal hover:text-white"
                         >
                           Ajouter
                         </button>
@@ -161,7 +161,7 @@ export default function AjouterArticlesPage({
         type="button"
         onClick={handleSubmit}
         disabled={items.length === 0 || submitting}
-        className="mt-6 w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
+        className="mt-6 w-full rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
       >
         {submitting
           ? "Envoi..."

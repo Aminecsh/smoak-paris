@@ -123,7 +123,7 @@ export default function LivraisonPage() {
         </p>
         <Link
           href="/commande"
-          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
+          className="mt-6 inline-block rounded-lg bg-signal px-5 py-2.5 text-xs font-semibold text-white hover:bg-signal-hover"
         >
           Retour au menu
         </Link>
@@ -178,7 +178,7 @@ export default function LivraisonPage() {
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+            <label className="text-xs font-semibold text-muted">
               Prénom
             </label>
             <input
@@ -189,7 +189,7 @@ export default function LivraisonPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+            <label className="text-xs font-semibold text-muted">
               Nom
             </label>
             <input
@@ -202,7 +202,7 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Email
           </label>
           <input
@@ -215,7 +215,7 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Téléphone
           </label>
           <div className="mt-1 flex gap-2">
@@ -243,7 +243,7 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Adresse
           </label>
           <div className="mt-1">
@@ -266,7 +266,7 @@ export default function LivraisonPage() {
         {addressSelection && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+              <label className="text-xs font-semibold text-muted">
                 Code postal
               </label>
               <input
@@ -276,7 +276,7 @@ export default function LivraisonPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+              <label className="text-xs font-semibold text-muted">
                 Ville
               </label>
               <input
@@ -289,7 +289,7 @@ export default function LivraisonPage() {
         )}
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Créneau de livraison
           </label>
           <div className="mt-1 grid grid-cols-4 gap-2">
@@ -322,7 +322,7 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Note pour le livreur (optionnel)
           </label>
           <textarea
@@ -334,7 +334,7 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          <label className="text-xs font-semibold text-muted">
             Paiement à la livraison
           </label>
           <div className="mt-1 grid grid-cols-2 gap-3">
@@ -384,7 +384,7 @@ export default function LivraisonPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-2 w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
+          className="mt-2 w-full rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
         >
           {submitting ? "Envoi..." : `Confirmer la commande — ${totalPrice.toFixed(2)} €`}
         </button>

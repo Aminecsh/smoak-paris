@@ -14,6 +14,10 @@ export interface ChichaBase {
   description: string;
   price: number;
   emoji: string;
+  image?: string;
+  // Pack "compose ta soirée" : une boisson et une sucrerie au choix sont
+  // incluses dans le prix, sans supplément (voir ChichaConfiguratorModal).
+  isPack?: boolean;
 }
 
 export interface ChichaFlavor {

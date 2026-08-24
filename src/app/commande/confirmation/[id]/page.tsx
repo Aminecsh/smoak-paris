@@ -130,7 +130,7 @@ export default async function ConfirmationPage(
 
       <Link
         href={`/commande/suivi/${order.id}`}
-        className="mt-6 block w-full rounded-full bg-signal px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
+        className="mt-6 block w-full rounded-lg bg-signal px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
       >
         Suivre ma commande
       </Link>

@@ -12,13 +12,16 @@ export const chichaBases: ChichaBase[] = [
     description: "1 chicha Quasar, goût, charbon, briquet, embout plastique.",
     price: 30,
     emoji: "🌌",
+    image: "/produits/Hawaii.png",
   },
   {
-    id: "khaloud",
-    name: "Khaloud",
-    description: "Notre chicha intense, pour les amateurs de saveurs corsées.",
-    price: 30,
-    emoji: "🔥",
+    id: "pack-zhama",
+    name: "Pack Zhama",
+    description: "Une chicha + une boisson + un bonbon au choix, en pack.",
+    price: 33.9,
+    emoji: "",
+    image: "/produits/Love66.png",
+    isPack: true,
   },
 ];
 

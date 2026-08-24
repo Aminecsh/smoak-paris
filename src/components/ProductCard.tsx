@@ -9,63 +9,64 @@ export default function ProductCard({ product }: { product: Product }) {
   const quantity = getQuantity(product.id);
 
   return (
-    <div className="flex items-start gap-4 rounded-xl border border-border bg-white p-4">
-      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary text-2xl">
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-white transition-shadow hover:shadow-md">
+      <div className="relative aspect-square overflow-hidden bg-secondary">
         {product.image ? (
           <Image
             src={product.image}
             alt={product.name}
-            width={56}
-            height={56}
-            className="h-full w-full object-cover"
+            width={300}
+            height={300}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          product.emoji
-        )}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-serif font-semibold text-ink">{product.name}</h3>
-          <span className="flex-shrink-0 font-mono text-sm font-semibold text-signal">
-            {product.price.toFixed(2)} €
+          <span className="flex h-full w-full items-center justify-center text-4xl">
+            {product.emoji}
           </span>
-        </div>
-        <p className="mt-1 text-sm text-muted">{product.description}</p>
+        )}
 
-        <div className="mt-3">
+        <div className="absolute bottom-2 right-2">
           {quantity === 0 ? (
             <button
               type="button"
               onClick={() => addToCart(product.id)}
-              className="rounded-full border border-border bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:border-signal hover:text-signal"
+              aria-label={`Ajouter ${product.name}`}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-lg font-semibold text-white shadow-md transition-transform hover:scale-105"
             >
-              Ajouter
+              +
             </button>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 rounded-full bg-ink px-1.5 py-1 text-white shadow-md">
               <button
                 type="button"
                 onClick={() => removeFromCart(product.id)}
                 aria-label={`Retirer ${product.name}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white text-ink hover:border-signal hover:text-signal"
+                className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-white/15"
               >
                 −
               </button>
-              <span className="w-4 text-center font-mono text-sm text-ink">
-                {quantity}
-              </span>
+              <span className="w-4 text-center font-mono text-sm">{quantity}</span>
               <button
                 type="button"
                 onClick={() => addToCart(product.id)}
                 aria-label={`Ajouter ${product.name}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
+                className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-white/15"
               >
                 +
               </button>
             </div>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="font-serif font-semibold text-ink">{product.name}</h3>
+        <p className="mt-1 line-clamp-2 flex-1 text-sm text-muted">
+          {product.description}
+        </p>
+        <p className="mt-2 font-mono text-sm font-semibold text-ink">
+          {product.price.toFixed(2)} €
+        </p>
       </div>
     </div>
   );

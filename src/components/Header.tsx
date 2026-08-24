@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
@@ -12,11 +11,7 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
-  const pathname = usePathname();
-  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
-  const [heroVisible, setHeroVisible] = useState(true);
-  const transparent = isHome && heroVisible;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -25,29 +20,9 @@ export default function Header() {
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!isHome) return;
-
-    const sentinel = document.getElementById("hero-sentinel");
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroVisible(!entry.isIntersecting),
-      { threshold: 0, rootMargin: "0px 0px -80px 0px" },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [isHome]);
-
   return (
     <>
-      <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-          transparent
-            ? "border-b border-transparent bg-transparent"
-            : "border-b border-border bg-white/95 backdrop-blur"
-        }`}
-      >
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-ink/60 backdrop-blur-xl">
         <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-center px-4 sm:px-6">
           <Link href="/">
             <Image
@@ -56,9 +31,7 @@ export default function Header() {
               width={936}
               height={491}
               priority
-              className={`h-16 w-auto transition-all duration-300 sm:h-[4.5rem] ${
-                transparent ? "brightness-0 invert" : ""
-              }`}
+              className="h-16 w-auto brightness-0 invert sm:h-[4.5rem]"
             />
           </Link>
         </div>
@@ -71,16 +44,8 @@ export default function Header() {
             aria-expanded={open}
             className="group flex flex-col items-end gap-1.5 p-3"
           >
-            <span
-              className={`h-0.5 w-7 rounded-full transition-all group-hover:w-8 group-hover:bg-signal ${
-                transparent ? "bg-white" : "bg-ink"
-              }`}
-            />
-            <span
-              className={`h-0.5 w-5 rounded-full transition-all group-hover:w-8 group-hover:bg-signal ${
-                transparent ? "bg-white" : "bg-ink"
-              }`}
-            />
+            <span className="h-0.5 w-7 rounded-full bg-white transition-all group-hover:w-8 group-hover:opacity-70" />
+            <span className="h-0.5 w-5 rounded-full bg-white transition-all group-hover:w-8 group-hover:opacity-70" />
           </button>
         </div>
       </header>
@@ -95,19 +60,21 @@ export default function Header() {
 
       <aside
         aria-hidden={!open}
-        className={`fixed right-0 top-0 z-[70] flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-4 top-4 bottom-4 z-[70] flex w-72 max-w-[80vw] flex-col rounded-2xl border border-white/10 bg-ink/80 shadow-2xl backdrop-blur-xl transition-all duration-300 ease-out ${
+          open
+            ? "translate-x-0 opacity-100"
+            : "pointer-events-none translate-x-8 opacity-0"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-5">
-          <span className="font-serif text-lg tracking-tight text-ink">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
+          <span className="font-serif text-lg tracking-tight text-white">
             Menu
           </span>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Fermer le menu"
-            className="flex h-8 w-8 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-ink"
+            className="flex h-8 w-8 items-center justify-center text-2xl leading-none text-white/60 transition-colors hover:text-white"
           >
             ×
           </button>
@@ -119,7 +86,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 text-base font-medium text-ink/80 transition-colors hover:bg-secondary hover:text-ink"
+              className="rounded-lg px-3 py-3 text-base font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             >
               {link.label}
             </Link>

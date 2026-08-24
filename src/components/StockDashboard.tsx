@@ -62,7 +62,7 @@ function StockRow({ item }: { item: StockItem }) {
         type="button"
         onClick={handleSave}
         disabled={!dirty || saving}
-        className="flex-shrink-0 rounded-full bg-signal px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover disabled:opacity-40"
+        className="flex-shrink-0 rounded-lg bg-signal px-3 py-1.5 text-[10px] font-semibold text-white hover:bg-signal-hover disabled:opacity-40"
       >
         {saving ? "..." : saved ? "✓" : "Enregistrer"}
       </button>

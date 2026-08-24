@@ -104,7 +104,7 @@ export default function ResendTrackingLink({
             type="button"
             onClick={handleCorrect}
             disabled={submitting}
-            className="rounded-full bg-signal px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover disabled:opacity-60"
+            className="rounded-lg bg-signal px-4 py-2 text-xs font-semibold text-white hover:bg-signal-hover disabled:opacity-60"
           >
             {submitting ? "Envoi..." : "Renvoyer le lien"}
           </button>

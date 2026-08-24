@@ -122,7 +122,7 @@ export default function PushSubscribeButton() {
       <button
         type="button"
         onClick={subscribe}
-        className="rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
+        className="rounded-lg bg-signal px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
       >
         Activer les notifications de commande
       </button>

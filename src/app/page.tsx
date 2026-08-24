@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
 import { products } from "@/lib/products";
+import OrderTab from "@/components/OrderTab";
 
 const PROCESS = [
   { n: "01", title: "Choisissez", desc: "Parcourez le menu et composez votre panier." },
@@ -38,24 +39,9 @@ export default function Home() {
         </video>
 
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/85" />
-
-        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-5 px-6 pb-16 text-center sm:pb-24">
-          <h1 className="font-serif text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Chicha livrée chez vous
-          </h1>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/70 sm:text-sm">
-            45 min · 7j/7 · 18h — 3h
-          </p>
-          <Link
-            href="/commande"
-            className="mt-2 rounded-full bg-signal px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg transition-colors hover:bg-signal-hover"
-          >
-            Commander
-          </Link>
-        </div>
       </section>
 
-      <div id="hero-sentinel" aria-hidden="true" className="h-px w-full" />
+      <OrderTab />
 
       <a
         href={`https://wa.me/${SERVICE_WHATSAPP_NUMBER}`}

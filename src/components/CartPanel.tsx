@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { products } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
@@ -15,6 +16,40 @@ function groupSupplementLines(lines: { id: string; name: string }[]) {
     else grouped.set(line.id, { name: line.name, quantity: 1 });
   }
   return Array.from(grouped.entries()).map(([id, value]) => ({ id, ...value }));
+}
+
+function Stepper({
+  quantity,
+  onDecrease,
+  onIncrease,
+  label,
+}: {
+  quantity: number;
+  onDecrease: () => void;
+  onIncrease: () => void;
+  label: string;
+}) {
+  return (
+    <div className="flex flex-shrink-0 items-center gap-1 rounded-full bg-ink px-1 py-1 text-white">
+      <button
+        type="button"
+        onClick={onDecrease}
+        aria-label={`Retirer ${label}`}
+        className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-white/15"
+      >
+        −
+      </button>
+      <span className="w-4 text-center font-mono text-xs">{quantity}</span>
+      <button
+        type="button"
+        onClick={onIncrease}
+        aria-label={`Ajouter ${label}`}
+        className="flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-white/15"
+      >
+        +
+      </button>
+    </div>
+  );
 }
 
 export default function CartPanel() {
@@ -37,7 +72,7 @@ export default function CartPanel() {
   const isEmpty = lines.length === 0 && configuredChichas.length === 0;
 
   return (
-    <div className="rounded-xl border border-border bg-white p-5">
+    <div className="rounded-2xl border border-border bg-white p-5">
       <div className="flex items-center justify-between">
         <h2 className="font-serif text-lg font-semibold text-ink">Votre panier</h2>
         {!isEmpty && (
@@ -57,10 +92,12 @@ export default function CartPanel() {
         </p>
       ) : (
         <>
-          <ul className="mt-4 flex flex-col gap-4">
+          <ul className="mt-4 flex flex-col divide-y divide-border">
             {configuredChichas.map((chicha) => (
-              <li key={chicha.id} className="flex items-start gap-3">
-                <span className="text-lg">{chicha.chichaEmoji}</span>
+              <li key={chicha.id} className="flex items-start gap-3 py-3 first:pt-0">
+                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-ink font-serif text-base font-semibold text-white">
+                  {chicha.chichaName.charAt(0)}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-ink">
                     {chicha.chichaName} — {chicha.flavorName}
@@ -81,46 +118,51 @@ export default function CartPanel() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-1 font-mono text-xs font-semibold text-signal">
-                    {chicha.unitPrice.toFixed(2)} € × {chicha.quantity}
+                  <p className="mt-1 font-mono text-xs font-semibold text-ink">
+                    {chicha.unitPrice.toFixed(2)} €
                   </p>
                 </div>
-                <input
-                  type="number"
-                  min={0}
-                  value={chicha.quantity}
-                  onChange={(e) =>
-                    setConfiguredChichaQuantity(
-                      chicha.id,
-                      Number(e.target.value),
-                    )
+                <Stepper
+                  quantity={chicha.quantity}
+                  label={`${chicha.chichaName} ${chicha.flavorName}`}
+                  onDecrease={() =>
+                    setConfiguredChichaQuantity(chicha.id, Math.max(0, chicha.quantity - 1))
                   }
-                  aria-label={`Quantité pour ${chicha.chichaName} ${chicha.flavorName}`}
-                  className="w-14 flex-shrink-0 rounded-md border border-border bg-white px-2 py-1 text-center text-sm text-ink"
+                  onIncrease={() =>
+                    setConfiguredChichaQuantity(chicha.id, chicha.quantity + 1)
+                  }
                 />
               </li>
             ))}
 
             {lines.map(({ product, quantity }) => (
-              <li key={product.id} className="flex items-center gap-3">
-                <span className="text-lg">{product.emoji}</span>
+              <li key={product.id} className="flex items-center gap-3 py-3 first:pt-0">
+                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary text-xl">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={44}
+                      height={44}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    product.emoji
+                  )}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-ink">
                     {product.name}
                   </p>
-                  <p className="font-mono text-xs font-semibold text-signal">
-                    {product.price.toFixed(2)} € × {quantity}
+                  <p className="font-mono text-xs font-semibold text-ink">
+                    {product.price.toFixed(2)} €
                   </p>
                 </div>
-                <input
-                  type="number"
-                  min={0}
-                  value={quantity}
-                  onChange={(e) =>
-                    setQuantity(product.id, Number(e.target.value))
-                  }
-                  aria-label={`Quantité pour ${product.name}`}
-                  className="w-14 rounded-md border border-border bg-white px-2 py-1 text-center text-sm text-ink"
+                <Stepper
+                  quantity={quantity}
+                  label={product.name}
+                  onDecrease={() => setQuantity(product.id, Math.max(0, quantity - 1))}
+                  onIncrease={() => setQuantity(product.id, quantity + 1)}
                 />
               </li>
             ))}
@@ -128,14 +170,14 @@ export default function CartPanel() {
 
           <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
             <span className="text-sm font-medium text-muted">Total</span>
-            <span className="font-mono text-lg font-bold text-signal">
+            <span className="font-mono text-lg font-bold text-ink">
               {totalPrice.toFixed(2)} €
             </span>
           </div>
 
           <Link
             href="/commande/livraison"
-            className="mt-4 block w-full rounded-full bg-signal px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
+            className="mt-4 block w-full rounded-lg bg-ink px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-signal-hover"
           >
             Valider la commande
           </Link>

@@ -124,7 +124,7 @@ export default function SuiviPage({
         </h1>
         <Link
           href="/commande"
-          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
+          className="mt-6 inline-block rounded-lg bg-signal px-5 py-2.5 text-xs font-semibold text-white hover:bg-signal-hover"
         >
           Retour au menu
         </Link>
@@ -162,7 +162,7 @@ export default function SuiviPage({
       {data.status === "recue" && (
         <Link
           href={`/commande/suivi/${id}/ajouter`}
-          className="mt-6 block w-full rounded-full border border-border bg-white px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-secondary"
+          className="mt-6 block w-full rounded-lg border border-border bg-white px-5 py-3 text-center text-xs font-semibold text-ink transition-colors hover:bg-secondary"
         >
           Ajouter des articles à ma commande
         </Link>
@@ -173,7 +173,7 @@ export default function SuiviPage({
           {data.route && (
             <div className="mb-3 flex items-center justify-between rounded-xl bg-signal px-5 py-4 text-white">
               <div>
-                <p className="text-xs uppercase tracking-[0.1em] text-white/70">
+                <p className="text-xs text-white/70">
                   Votre livreur arrive
                 </p>
                 <p className="mt-0.5 font-serif text-2xl">
@@ -181,7 +181,7 @@ export default function SuiviPage({
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.1em] text-white/70">Distance</p>
+                <p className="text-xs text-white/70">Distance</p>
                 <p className="mt-0.5 font-mono text-lg">
                   {formatDistance(data.route.distanceMeters)}
                 </p>
@@ -196,7 +196,7 @@ export default function SuiviPage({
           )}
           <a
             href={`tel:${driverPhone}`}
-            className="mt-4 inline-block w-full rounded-full bg-signal px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
+            className="mt-4 inline-block w-full rounded-lg bg-signal px-5 py-3 text-center text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
           >
             Contacter le livreur — {driverPhoneDisplay}
           </a>
@@ -218,7 +218,7 @@ export default function SuiviPage({
 
           <a
             href={`tel:${SERVICE_PHONE_NUMBER}`}
-            className="mt-4 inline-block w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
+            className="mt-4 inline-block w-full rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
           >
             Je veux la rendre maintenant — {SERVICE_PHONE_DISPLAY}
           </a>
@@ -227,13 +227,13 @@ export default function SuiviPage({
             <button
               type="button"
               onClick={() => setShowEarlyReturnPicker(true)}
-              className="mt-3 block w-full rounded-full border border-border bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-secondary"
+              className="mt-3 block w-full rounded-lg border border-border bg-white px-5 py-3 text-xs font-semibold text-ink transition-colors hover:bg-secondary"
             >
               Rendre ma chicha plus tôt
             </button>
           ) : (
             <div className="mt-3 rounded-xl border border-border bg-white p-4 text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+              <p className="text-xs font-semibold text-muted">
                 Choisis un créneau
               </p>
               {earlyReturnSlots.length > 0 ? (

@@ -16,8 +16,8 @@
   --color-border: #e5e3de;
   --color-surface: #fafaf8;
   --color-secondary: #f0efec;
-  --color-signal: #8b5cf6;
-  --color-signal-hover: #7c3aed;
+  --color-signal: #111111;
+  --color-signal-hover: #2a2a2a;
 }
 
 body {

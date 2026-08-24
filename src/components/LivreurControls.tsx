@@ -89,7 +89,7 @@ export default function LivreurControls({
               type="button"
               disabled={updating || s.key === status}
               onClick={() => updateStatus(s.key)}
-              className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-colors disabled:opacity-50 ${
+              className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors disabled:opacity-50 ${
                 s.key === status
                   ? "bg-signal text-white"
                   : "border border-border text-ink hover:bg-secondary"
@@ -112,7 +112,7 @@ export default function LivreurControls({
         <button
           type="button"
           onClick={toggleSharing}
-          className={`mt-3 w-full rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition-colors ${
+          className={`mt-3 w-full rounded-lg px-4 py-2.5 text-xs font-semibold transition-colors ${
             sharing
               ? "bg-red-600 text-white hover:bg-red-700"
               : "bg-signal text-white hover:bg-signal-hover"

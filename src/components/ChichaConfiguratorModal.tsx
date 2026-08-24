@@ -20,12 +20,13 @@ export default function ChichaConfiguratorModal({
   onClose: () => void;
 }) {
   const { addConfiguredChicha } = useCart();
+  const isPack = Boolean(chicha.isPack);
 
   const [flavorId, setFlavorId] = useState(chichaFlavors[0].id);
   const [recharge, setRecharge] = useState(false);
   const [extraCharcoal, setExtraCharcoal] = useState(false);
-  const [drinkQuantities, setDrinkQuantities] = useState<Record<string, number>>({});
-  const [sweetQuantities, setSweetQuantities] = useState<Record<string, number>>({});
+  const [packDrinkId, setPackDrinkId] = useState(drinkSupplements[0]?.id ?? "");
+  const [packSweetId, setPackSweetId] = useState(sweetSupplements[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -41,35 +42,18 @@ export default function ChichaConfiguratorModal({
     };
   }, [onClose]);
 
-  const adjustQuantity = (
-    setter: React.Dispatch<React.SetStateAction<Record<string, number>>>,
-    id: string,
-    delta: number,
-  ) => {
-    setter((prev) => {
-      const next = Math.max(0, (prev[id] ?? 0) + delta);
-      if (next === 0) {
-        const rest = { ...prev };
-        delete rest[id];
-        return rest;
-      }
-      return { ...prev, [id]: next };
-    });
-  };
+  const packDrink = drinkSupplements.find((d) => d.id === packDrinkId);
+  const packSweet = sweetSupplements.find((s) => s.id === packSweetId);
 
-  const selectedDrinks = drinkSupplements.flatMap((d) =>
-    Array<typeof d>(drinkQuantities[d.id] ?? 0).fill(d),
-  );
-  const selectedSweets = sweetSupplements.flatMap((s) =>
-    Array<typeof s>(sweetQuantities[s.id] ?? 0).fill(s),
-  );
+  const selectedDrinks =
+    isPack && packDrink ? [{ id: packDrink.id, name: packDrink.name, price: 0 }] : [];
+  const selectedSweets =
+    isPack && packSweet ? [{ id: packSweet.id, name: packSweet.name, price: 0 }] : [];
 
   const unitPrice =
     chicha.price +
     (recharge ? rechargeSupplement.price : 0) +
-    (extraCharcoal ? charcoalSupplement.price : 0) +
-    selectedDrinks.reduce((sum, d) => sum + d.price, 0) +
-    selectedSweets.reduce((sum, s) => sum + s.price, 0);
+    (extraCharcoal ? charcoalSupplement.price : 0);
 
   const handleAdd = () => {
     const flavor = chichaFlavors.find((f) => f.id === flavorId)!;
@@ -103,8 +87,8 @@ export default function ChichaConfiguratorModal({
       >
         <div className="flex items-start justify-between gap-4 border-b border-border p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-secondary text-2xl">
-              {chicha.emoji}
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-ink font-serif text-lg font-semibold text-white">
+              {chicha.name.charAt(0)}
             </div>
             <div>
               <h2 className="font-serif text-lg font-semibold text-ink">
@@ -214,121 +198,89 @@ export default function ChichaConfiguratorModal({
             </div>
           </section>
 
-          {/* Boisson */}
-          <section className="mt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-              Boisson
-            </h3>
-            <div className="mt-3 flex flex-col gap-2">
-              {drinkSupplements.map((drink) => {
-                const qty = drinkQuantities[drink.id] ?? 0;
-                return (
-                  <div
-                    key={drink.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm"
-                  >
-                    <span className="flex min-w-0 items-center gap-3">
-                      {drink.image && (
-                        <Image
-                          src={drink.image}
-                          alt={drink.name}
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-                        />
-                      )}
-                      <span className="truncate text-ink">
-                        {drink.name}
-                        <span className="ml-2 font-mono text-xs text-muted">
-                          +{drink.price.toFixed(2)} €
-                        </span>
+          {isPack && (
+            <>
+              {/* Boisson */}
+              <section className="mt-6">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+                  Boisson <span className="text-muted">— incluse, au choix</span>
+                </h3>
+                <div className="mt-3 flex flex-col gap-2">
+                  {drinkSupplements.map((drink) => (
+                    <label
+                      key={drink.id}
+                      className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                        packDrinkId === drink.id
+                          ? "border-signal bg-secondary"
+                          : "border-border hover:bg-secondary/60"
+                      }`}
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        {drink.image && (
+                          <Image
+                            src={drink.image}
+                            alt={drink.name}
+                            width={40}
+                            height={40}
+                            className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                          />
+                        )}
+                        <span className="truncate text-ink">{drink.name}</span>
                       </span>
-                    </span>
-                    <div className="flex flex-shrink-0 items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => adjustQuantity(setDrinkQuantities, drink.id, -1)}
-                        disabled={qty === 0}
-                        aria-label={`Retirer ${drink.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-ink hover:bg-secondary disabled:opacity-30"
-                      >
-                        −
-                      </button>
-                      <span className="w-4 text-center font-mono text-sm text-ink">
-                        {qty}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => adjustQuantity(setDrinkQuantities, drink.id, 1)}
-                        aria-label={`Ajouter ${drink.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                      <input
+                        type="radio"
+                        name="pack-drink"
+                        value={drink.id}
+                        checked={packDrinkId === drink.id}
+                        onChange={() => setPackDrinkId(drink.id)}
+                        className="h-4 w-4 flex-shrink-0 accent-signal"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </section>
 
-          {/* Sucreries */}
-          <section className="mt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-              Sucreries
-            </h3>
-            <div className="mt-3 flex flex-col gap-2">
-              {sweetSupplements.map((sweet) => {
-                const qty = sweetQuantities[sweet.id] ?? 0;
-                return (
-                  <div
-                    key={sweet.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm"
-                  >
-                    <span className="flex min-w-0 items-center gap-3">
-                      {sweet.image && (
-                        <Image
-                          src={sweet.image}
-                          alt={sweet.name}
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-                        />
-                      )}
-                      <span className="truncate text-ink">
-                        {sweet.name}
-                        <span className="ml-2 font-mono text-xs text-muted">
-                          +{sweet.price.toFixed(2)} €
-                        </span>
+              {/* Sucreries */}
+              <section className="mt-6">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+                  Sucreries <span className="text-muted">— incluse, au choix</span>
+                </h3>
+                <div className="mt-3 flex flex-col gap-2">
+                  {sweetSupplements.map((sweet) => (
+                    <label
+                      key={sweet.id}
+                      className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                        packSweetId === sweet.id
+                          ? "border-signal bg-secondary"
+                          : "border-border hover:bg-secondary/60"
+                      }`}
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        {sweet.image && (
+                          <Image
+                            src={sweet.image}
+                            alt={sweet.name}
+                            width={40}
+                            height={40}
+                            className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                          />
+                        )}
+                        <span className="truncate text-ink">{sweet.name}</span>
                       </span>
-                    </span>
-                    <div className="flex flex-shrink-0 items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => adjustQuantity(setSweetQuantities, sweet.id, -1)}
-                        disabled={qty === 0}
-                        aria-label={`Retirer ${sweet.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-ink hover:bg-secondary disabled:opacity-30"
-                      >
-                        −
-                      </button>
-                      <span className="w-4 text-center font-mono text-sm text-ink">
-                        {qty}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => adjustQuantity(setSweetQuantities, sweet.id, 1)}
-                        aria-label={`Ajouter ${sweet.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                      <input
+                        type="radio"
+                        name="pack-sweet"
+                        value={sweet.id}
+                        checked={packSweetId === sweet.id}
+                        onChange={() => setPackSweetId(sweet.id)}
+                        className="h-4 w-4 flex-shrink-0 accent-signal"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3 border-t border-border p-5">
@@ -358,7 +310,7 @@ export default function ChichaConfiguratorModal({
             type="button"
             onClick={handleAdd}
             disabled={justAdded}
-            className="flex flex-1 items-center justify-between rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-70"
+            className="flex flex-1 items-center justify-between rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:opacity-70"
           >
             <span>{justAdded ? "Ajouté ✓" : "Ajouter au panier"}</span>
             <span className="font-mono">

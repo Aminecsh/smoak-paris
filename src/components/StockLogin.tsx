@@ -53,7 +53,7 @@ export default function StockLogin() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover disabled:opacity-60"
+          className="rounded-lg bg-signal px-5 py-2.5 text-xs font-semibold text-white hover:bg-signal-hover disabled:opacity-60"
         >
           {submitting ? "..." : "Entrer"}
         </button>

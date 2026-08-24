@@ -52,13 +52,13 @@ export default function QuiSommesNousPage() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/commande"
-              className="rounded-full bg-signal px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-signal-hover"
+              className="rounded-lg bg-signal px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-signal-hover"
             >
               Lancer une commande
             </Link>
             <Link
               href="/contact"
-              className="rounded-full border border-white/30 px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-white/60"
+              className="rounded-lg border border-white/30 px-8 py-3 text-sm font-semibold text-white transition-colors hover:border-white/60"
             >
               Nous contacter
             </Link>
@@ -165,7 +165,7 @@ export default function QuiSommesNousPage() {
           </p>
           <Link
             href="/commande"
-            className="rounded-full bg-signal px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg transition-colors hover:bg-signal-hover"
+            className="rounded-lg bg-signal px-8 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-signal-hover"
           >
             Commander maintenant
           </Link>
