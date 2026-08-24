@@ -17,14 +17,14 @@ export default function OrderStatusStepper({ status }: { status: string }) {
             <div className="flex flex-col items-center gap-1.5">
               <div
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                  done ? "bg-brand text-white" : "bg-brand/10 text-brand/40"
+                  done ? "bg-signal text-white" : "bg-border text-muted"
                 }`}
               >
                 {done ? "✓" : i + 1}
               </div>
               <span
                 className={`whitespace-nowrap text-[10px] font-medium uppercase tracking-wide ${
-                  done ? "text-brand" : "text-brand/40"
+                  done ? "text-ink" : "text-muted"
                 }`}
               >
                 {step.label}
@@ -33,7 +33,7 @@ export default function OrderStatusStepper({ status }: { status: string }) {
             {i < STEPS.length - 1 && (
               <div
                 className={`mx-1 mb-4 h-0.5 flex-1 ${
-                  i < currentIndex ? "bg-brand" : "bg-brand/10"
+                  i < currentIndex ? "bg-signal" : "bg-border"
                 }`}
               />
             )}

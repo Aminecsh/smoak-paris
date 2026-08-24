@@ -62,67 +62,67 @@ export default async function ConfirmationPage(
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
-      <div className="rounded-xl border border-brand/10 bg-cream p-6 text-center">
+      <div className="rounded-xl border border-border bg-secondary p-6 text-center">
         <span className="text-3xl">✅</span>
-        <h1 className="mt-2 font-serif text-2xl font-semibold text-brand">
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-ink">
           Commande confirmée
         </h1>
-        <p className="mt-1 text-sm text-brand/60">
+        <p className="mt-1 text-sm text-muted">
           Commande n° {formatOrderReference(order.order_number)} —{" "}
           {PAYMENT_LABELS[order.payment_method] ?? order.payment_method}
         </p>
       </div>
 
-      <div className="mt-6 rounded-xl border border-brand/10 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+      <div className="mt-6 rounded-xl border border-border p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
           Récapitulatif
         </h2>
-        <ul className="mt-3 flex flex-col gap-1.5 text-sm text-brand/70">
+        <ul className="mt-3 flex flex-col gap-1.5 text-sm text-muted">
           {(items ?? []).map((item) => (
             <li key={item.id} className="flex justify-between gap-2">
               <span className="truncate">
                 {item.quantity} × {item.name}
               </span>
-              <span className="flex-shrink-0 font-mono">
+              <span className="flex-shrink-0 font-mono font-semibold text-signal">
                 {(item.unit_price * item.quantity).toFixed(2)} €
               </span>
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex items-center justify-between border-t border-brand/10 pt-3">
-          <span className="text-sm font-medium text-brand/70">Total</span>
-          <span className="font-mono text-lg font-bold text-brand">
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-medium text-muted">Total</span>
+          <span className="font-mono text-lg font-bold text-signal">
             {order.total_price.toFixed(2)} €
           </span>
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl border border-brand/10 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+      <div className="mt-6 rounded-xl border border-border p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
           Livraison
         </h2>
-        <p className="mt-2 text-sm text-brand">{order.customer_name}</p>
+        <p className="mt-2 text-sm text-ink">{order.customer_name}</p>
         {order.customer_email && (
-          <p className="text-sm text-brand/70">{order.customer_email}</p>
+          <p className="text-sm text-muted">{order.customer_email}</p>
         )}
-        <p className="text-sm text-brand/70">{order.customer_phone}</p>
+        <p className="text-sm text-muted">{order.customer_phone}</p>
         <ResendTrackingLink orderId={order.id} initialChannel={order.notification_channel} />
-        <p className="mt-2 text-sm text-brand/70">
+        <p className="mt-2 text-sm text-muted">
           {order.delivery_address}, {order.postal_code} {order.city}
         </p>
         {order.delivery_zone && (
-          <p className="text-xs text-brand/40">
+          <p className="text-xs text-muted">
             Secteur : {DELIVERY_ZONE_LABELS[order.delivery_zone]}
           </p>
         )}
         {order.delivery_slot && (
-          <p className="mt-2 text-sm text-brand/70">
+          <p className="mt-2 text-sm text-muted">
             Créneau : {formatSlotLabel(order.delivery_slot)} — chicha à rendre
             avant {getReturnTimeLabel(order.delivery_slot)}
           </p>
         )}
         {order.delivery_note && (
-          <p className="mt-2 text-xs text-brand/50">
+          <p className="mt-2 text-xs text-muted">
             Note : {order.delivery_note}
           </p>
         )}
@@ -130,14 +130,14 @@ export default async function ConfirmationPage(
 
       <Link
         href={`/commande/suivi/${order.id}`}
-        className="mt-6 block w-full rounded-full bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+        className="mt-6 block w-full rounded-full bg-signal px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
       >
         Suivre ma commande
       </Link>
 
       <Link
         href="/commande"
-        className="mt-3 block text-center text-xs font-medium text-brand/50 hover:text-brand"
+        className="mt-3 block text-center text-xs font-medium text-muted hover:text-ink"
       >
         Retour au menu
       </Link>

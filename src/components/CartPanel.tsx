@@ -37,14 +37,14 @@ export default function CartPanel() {
   const isEmpty = lines.length === 0 && configuredChichas.length === 0;
 
   return (
-    <div className="rounded-xl border border-brand/10 bg-cream p-5">
+    <div className="rounded-xl border border-border bg-white p-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-serif text-lg font-semibold text-brand">Votre panier</h2>
+        <h2 className="font-serif text-lg font-semibold text-ink">Votre panier</h2>
         {!isEmpty && (
           <button
             type="button"
             onClick={clearCart}
-            className="text-xs font-medium text-brand/40 hover:text-brand"
+            className="text-xs font-medium text-muted hover:text-ink"
           >
             Vider
           </button>
@@ -52,7 +52,7 @@ export default function CartPanel() {
       </div>
 
       {isEmpty ? (
-        <p className="mt-4 text-sm text-brand/50">
+        <p className="mt-4 text-sm text-muted">
           Votre panier est vide. Ajoutez des produits pour commencer.
         </p>
       ) : (
@@ -62,10 +62,10 @@ export default function CartPanel() {
               <li key={chicha.id} className="flex items-start gap-3">
                 <span className="text-lg">{chicha.chichaEmoji}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-brand">
+                  <p className="truncate text-sm font-medium text-ink">
                     {chicha.chichaName} — {chicha.flavorName}
                   </p>
-                  <ul className="mt-0.5 text-xs text-brand/50">
+                  <ul className="mt-0.5 text-xs text-muted">
                     {chicha.recharge && <li>+ Tête en plus</li>}
                     {chicha.extraCharcoal && <li>+ Pack de charbon</li>}
                     {groupSupplementLines(chicha.drinks).map((drink) => (
@@ -81,7 +81,7 @@ export default function CartPanel() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-1 font-mono text-xs text-brand/50">
+                  <p className="mt-1 font-mono text-xs font-semibold text-signal">
                     {chicha.unitPrice.toFixed(2)} € × {chicha.quantity}
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export default function CartPanel() {
                     )
                   }
                   aria-label={`Quantité pour ${chicha.chichaName} ${chicha.flavorName}`}
-                  className="w-14 flex-shrink-0 rounded-md border border-brand/20 bg-white px-2 py-1 text-center text-sm text-brand"
+                  className="w-14 flex-shrink-0 rounded-md border border-border bg-white px-2 py-1 text-center text-sm text-ink"
                 />
               </li>
             ))}
@@ -105,10 +105,10 @@ export default function CartPanel() {
               <li key={product.id} className="flex items-center gap-3">
                 <span className="text-lg">{product.emoji}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-brand">
+                  <p className="truncate text-sm font-medium text-ink">
                     {product.name}
                   </p>
-                  <p className="font-mono text-xs text-brand/50">
+                  <p className="font-mono text-xs font-semibold text-signal">
                     {product.price.toFixed(2)} € × {quantity}
                   </p>
                 </div>
@@ -120,22 +120,22 @@ export default function CartPanel() {
                     setQuantity(product.id, Number(e.target.value))
                   }
                   aria-label={`Quantité pour ${product.name}`}
-                  className="w-14 rounded-md border border-brand/20 bg-white px-2 py-1 text-center text-sm text-brand"
+                  className="w-14 rounded-md border border-border bg-white px-2 py-1 text-center text-sm text-ink"
                 />
               </li>
             ))}
           </ul>
 
-          <div className="mt-5 flex items-center justify-between border-t border-brand/10 pt-4">
-            <span className="text-sm font-medium text-brand/70">Total</span>
-            <span className="font-mono text-lg font-bold text-brand">
+          <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+            <span className="text-sm font-medium text-muted">Total</span>
+            <span className="font-mono text-lg font-bold text-signal">
               {totalPrice.toFixed(2)} €
             </span>
           </div>
 
           <Link
             href="/commande/livraison"
-            className="mt-4 block w-full rounded-full bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+            className="mt-4 block w-full rounded-full bg-signal px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
           >
             Valider la commande
           </Link>

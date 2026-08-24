@@ -2,13 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Cinzel } from "next/font/google";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  weight: ["500", "600"],
-});
 
 const NAV_LINKS = [
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
@@ -17,7 +12,11 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(true);
+  const transparent = isHome && heroVisible;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -26,9 +25,29 @@ export default function Header() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!isHome) return;
+
+    const sentinel = document.getElementById("hero-sentinel");
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroVisible(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "0px 0px -80px 0px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [isHome]);
+
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-brand/10 bg-white/95 backdrop-blur">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+          transparent
+            ? "border-b border-transparent bg-transparent"
+            : "border-b border-border bg-white/95 backdrop-blur"
+        }`}
+      >
         <div className="relative mx-auto flex h-20 max-w-6xl items-center justify-center px-4 sm:px-6">
           <Link href="/">
             <Image
@@ -37,7 +56,9 @@ export default function Header() {
               width={936}
               height={491}
               priority
-              className="h-16 w-auto sm:h-[4.5rem]"
+              className={`h-16 w-auto transition-all duration-300 sm:h-[4.5rem] ${
+                transparent ? "brightness-0 invert" : ""
+              }`}
             />
           </Link>
         </div>
@@ -50,8 +71,16 @@ export default function Header() {
             aria-expanded={open}
             className="group flex flex-col items-end gap-1.5 p-3"
           >
-            <span className="h-0.5 w-7 rounded-full bg-brand transition-all group-hover:w-8 group-hover:bg-brand-soft" />
-            <span className="h-0.5 w-5 rounded-full bg-brand transition-all group-hover:w-8 group-hover:bg-brand-soft" />
+            <span
+              className={`h-0.5 w-7 rounded-full transition-all group-hover:w-8 group-hover:bg-signal ${
+                transparent ? "bg-white" : "bg-ink"
+              }`}
+            />
+            <span
+              className={`h-0.5 w-5 rounded-full transition-all group-hover:w-8 group-hover:bg-signal ${
+                transparent ? "bg-white" : "bg-ink"
+              }`}
+            />
           </button>
         </div>
       </header>
@@ -59,26 +88,26 @@ export default function Header() {
       <div
         aria-hidden={!open}
         onClick={() => setOpen(false)}
-        className={`fixed inset-0 z-30 bg-black/40 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[60] bg-ink/40 transition-opacity duration-300 ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
 
       <aside
         aria-hidden={!open}
-        className={`fixed right-0 top-0 z-40 flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed right-0 top-0 z-[70] flex h-full w-72 max-w-[80vw] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-brand/10 px-5 py-5">
-          <span className={`${cinzel.className} text-lg tracking-wide text-brand`}>
+        <div className="flex items-center justify-between border-b border-border px-5 py-5">
+          <span className="font-serif text-lg tracking-tight text-ink">
             Menu
           </span>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Fermer le menu"
-            className="flex h-8 w-8 items-center justify-center text-2xl leading-none text-brand/60 transition-colors hover:text-brand"
+            className="flex h-8 w-8 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-ink"
           >
             ×
           </button>
@@ -90,7 +119,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className={`${cinzel.className} rounded-lg px-3 py-3 text-base tracking-wide text-brand/80 transition-colors hover:bg-cream hover:text-brand`}
+              className="rounded-lg px-3 py-3 text-base font-medium text-ink/80 transition-colors hover:bg-secondary hover:text-ink"
             >
               {link.label}
             </Link>

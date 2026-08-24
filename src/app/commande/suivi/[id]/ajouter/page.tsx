@@ -56,16 +56,16 @@ export default function AjouterArticlesPage({
     return (
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center sm:px-6">
         <span className="text-3xl">✅</span>
-        <h1 className="mt-2 font-serif text-2xl font-semibold text-brand">
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-ink">
           Articles ajoutés
         </h1>
-        <p className="mt-2 text-sm text-brand/60">
+        <p className="mt-2 text-sm text-muted">
           + {result.addedTotal.toFixed(2)} € — nouveau total :{" "}
           {result.newTotal.toFixed(2)} €
         </p>
         <Link
           href={`/commande/suivi/${id}`}
-          className="mt-6 inline-block rounded-full bg-brand px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-soft"
+          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
         >
           Retour au suivi
         </Link>
@@ -75,17 +75,17 @@ export default function AjouterArticlesPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-3xl font-semibold tracking-tight text-brand">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">
         Ajouter à ma commande
       </h1>
-      <p className="mt-1 text-sm text-brand/60">
+      <p className="mt-1 text-sm text-muted">
         Le supplément sera réglé à la livraison, avec le reste de la commande.
       </p>
 
       <div className="mt-8 flex flex-col gap-8">
         {categories.map((category) => (
           <section key={category}>
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               {category}
             </h2>
             <div className="flex flex-col gap-3">
@@ -96,18 +96,18 @@ export default function AjouterArticlesPage({
                   return (
                     <div
                       key={product.id}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-brand/10 bg-cream p-4"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white p-4"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-serif font-semibold text-brand">
+                          <h3 className="font-serif font-semibold text-ink">
                             {product.name}
                           </h3>
-                          <span className="flex-shrink-0 font-mono text-sm text-brand/70">
+                          <span className="flex-shrink-0 font-mono text-sm font-semibold text-signal">
                             {product.price.toFixed(2)} €
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-brand/60">
+                        <p className="mt-1 text-sm text-muted">
                           {product.description}
                         </p>
                       </div>
@@ -116,7 +116,7 @@ export default function AjouterArticlesPage({
                         <button
                           type="button"
                           onClick={() => addOne(product.id)}
-                          className="flex-shrink-0 rounded-full border border-brand/20 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-brand transition-colors hover:bg-brand hover:text-white"
+                          className="flex-shrink-0 rounded-full border border-border bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-signal hover:text-white"
                         >
                           Ajouter
                         </button>
@@ -126,18 +126,18 @@ export default function AjouterArticlesPage({
                             type="button"
                             onClick={() => removeOne(product.id)}
                             aria-label={`Retirer ${product.name}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand hover:bg-brand/10"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-ink hover:bg-signal/10"
                           >
                             −
                           </button>
-                          <span className="w-4 text-center font-mono text-sm text-brand">
+                          <span className="w-4 text-center font-mono text-sm text-ink">
                             {quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => addOne(product.id)}
                             aria-label={`Ajouter ${product.name}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-soft"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
                           >
                             +
                           </button>
@@ -161,7 +161,7 @@ export default function AjouterArticlesPage({
         type="button"
         onClick={handleSubmit}
         disabled={items.length === 0 || submitting}
-        className="mt-6 w-full rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft disabled:opacity-60"
+        className="mt-6 w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
       >
         {submitting
           ? "Envoi..."
@@ -170,7 +170,7 @@ export default function AjouterArticlesPage({
 
       <Link
         href={`/commande/suivi/${id}`}
-        className="mt-3 block text-center text-xs font-medium text-brand/50 hover:text-brand"
+        className="mt-3 block text-center text-xs font-medium text-muted hover:text-ink"
       >
         Annuler
       </Link>

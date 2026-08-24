@@ -119,12 +119,12 @@ export default function SuiviPage({
   if (notFound) {
     return (
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center sm:px-6">
-        <h1 className="font-serif text-2xl font-semibold text-brand">
+        <h1 className="font-serif text-2xl font-semibold text-ink">
           Commande introuvable
         </h1>
         <Link
           href="/commande"
-          className="mt-6 inline-block rounded-full bg-brand px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-soft"
+          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
         >
           Retour au menu
         </Link>
@@ -135,7 +135,7 @@ export default function SuiviPage({
   if (!data) {
     return (
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center sm:px-6">
-        <p className="text-sm text-brand/50">Chargement...</p>
+        <p className="text-sm text-muted">Chargement...</p>
       </main>
     );
   }
@@ -151,18 +151,18 @@ export default function SuiviPage({
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-2xl font-semibold text-brand">
+      <h1 className="font-serif text-2xl font-semibold text-ink">
         Suivi — commande n° {formatOrderReference(data.orderNumber)}
       </h1>
 
-      <div className="mt-6 rounded-xl border border-brand/10 bg-cream p-5">
+      <div className="mt-6 rounded-xl border border-border bg-secondary p-5">
         <OrderStatusStepper status={data.status} />
       </div>
 
       {data.status === "recue" && (
         <Link
           href={`/commande/suivi/${id}/ajouter`}
-          className="mt-6 block w-full rounded-full border border-brand/20 bg-white px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-brand transition-colors hover:bg-cream"
+          className="mt-6 block w-full rounded-full border border-border bg-white px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-secondary"
         >
           Ajouter des articles à ma commande
         </Link>
@@ -171,7 +171,7 @@ export default function SuiviPage({
       {data.status === "en_livraison" && (
         <div className="mt-6">
           {data.route && (
-            <div className="mb-3 flex items-center justify-between rounded-xl bg-brand px-5 py-4 text-white">
+            <div className="mb-3 flex items-center justify-between rounded-xl bg-signal px-5 py-4 text-white">
               <div>
                 <p className="text-xs uppercase tracking-[0.1em] text-white/70">
                   Votre livreur arrive
@@ -190,13 +190,13 @@ export default function SuiviPage({
           )}
           <TrackingMap driver={data.driver} delivery={data.delivery} route={data.route?.geometry} />
           {!data.driver && (
-            <p className="mt-2 text-center text-xs text-brand/50">
+            <p className="mt-2 text-center text-xs text-muted">
               En attente de la position du livreur...
             </p>
           )}
           <a
             href={`tel:${driverPhone}`}
-            className="mt-4 inline-block w-full rounded-full bg-brand px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+            className="mt-4 inline-block w-full rounded-full bg-signal px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
           >
             Contacter le livreur — {driverPhoneDisplay}
           </a>
@@ -204,12 +204,12 @@ export default function SuiviPage({
       )}
 
       {data.status === "livree" && (
-        <div className="mt-6 rounded-xl border border-brand/10 bg-cream p-5 text-center">
-          <p className="text-sm text-brand/60">
+        <div className="mt-6 rounded-xl border border-border bg-secondary p-5 text-center">
+          <p className="text-sm text-muted">
             Votre commande a été livrée. Bon moment ✨
           </p>
           {data.deliverySlot && (
-            <p className="mt-2 text-sm font-medium text-brand">
+            <p className="mt-2 text-sm font-medium text-ink">
               {data.earlyReturnSlot
                 ? `Votre livreur reviendra chercher la chicha à ${formatSlotLabel(data.earlyReturnSlot)}.`
                 : `Votre livreur reviendra chercher la chicha à ${getReturnTimeLabel(data.deliverySlot)}.`}
@@ -218,7 +218,7 @@ export default function SuiviPage({
 
           <a
             href={`tel:${SERVICE_PHONE_NUMBER}`}
-            className="mt-4 inline-block w-full rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+            className="mt-4 inline-block w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
           >
             Je veux la rendre maintenant — {SERVICE_PHONE_DISPLAY}
           </a>
@@ -227,13 +227,13 @@ export default function SuiviPage({
             <button
               type="button"
               onClick={() => setShowEarlyReturnPicker(true)}
-              className="mt-3 block w-full rounded-full border border-brand/20 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-brand transition-colors hover:bg-cream"
+              className="mt-3 block w-full rounded-full border border-border bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-secondary"
             >
               Rendre ma chicha plus tôt
             </button>
           ) : (
-            <div className="mt-3 rounded-xl border border-brand/10 bg-white p-4 text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            <div className="mt-3 rounded-xl border border-border bg-white p-4 text-left">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                 Choisis un créneau
               </p>
               {earlyReturnSlots.length > 0 ? (
@@ -244,14 +244,14 @@ export default function SuiviPage({
                       type="button"
                       disabled={earlyReturnSubmitting}
                       onClick={() => chooseEarlyReturnSlot(slot)}
-                      className="rounded-lg border border-brand/20 px-2 py-2 text-sm text-brand/70 transition-colors hover:border-brand hover:bg-cream hover:text-brand disabled:opacity-60"
+                      className="rounded-lg border border-border px-2 py-2 text-sm text-muted transition-colors hover:border-signal hover:bg-secondary hover:text-ink disabled:opacity-60"
                     >
                       {formatSlotLabel(slot)}
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="mt-2 text-xs text-brand/50">
+                <p className="mt-2 text-xs text-muted">
                   Aucun créneau plus tôt disponible — appelle-nous directement.
                 </p>
               )}
@@ -267,7 +267,7 @@ export default function SuiviPage({
 
       <Link
         href="/commande"
-        className="mt-6 block text-center text-xs font-medium text-brand/50 hover:text-brand"
+        className="mt-6 block text-center text-xs font-medium text-muted hover:text-ink"
       >
         Retour au menu
       </Link>

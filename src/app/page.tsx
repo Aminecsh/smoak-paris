@@ -1,28 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
+import { products } from "@/lib/products";
 
-const steps = [
-  {
-    emoji: "📋",
-    title: "Choisissez",
-    desc: "Parcourez le menu et composez votre panier.",
-  },
-  {
-    emoji: "✅",
-    title: "Commandez",
-    desc: "Renseignez votre adresse et validez.",
-  },
-  {
-    emoji: "📍",
-    title: "Suivez",
-    desc: "Suivez votre livreur en temps réel sur la carte.",
-  },
+const PROCESS = [
+  { n: "01", title: "Choisissez", desc: "Parcourez le menu et composez votre panier." },
+  { n: "02", title: "Commandez", desc: "Renseignez votre adresse et validez, paiement à la livraison." },
+  { n: "03", title: "Suivez", desc: "Votre livreur en temps réel sur la carte, jusqu'à votre porte." },
 ];
+
+const HIGHLIGHT_IDS = [
+  "canette-coca-cola",
+  "red-bull",
+  "bonbons-fini-fraise",
+  "popcorn-caramel",
+  "canette-hawaii",
+  "crazy-tiger",
+];
+
+const highlights = HIGHLIGHT_IDS.map((id) => products.find((p) => p.id === id)).filter(
+  (p): p is (typeof products)[number] => Boolean(p),
+);
 
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col">
-      <section className="relative h-[calc(100vh-5rem)] w-full overflow-hidden">
+      <section className="relative h-[100dvh] w-full overflow-hidden">
         <video
           autoPlay
           muted
@@ -33,8 +36,26 @@ export default function Home() {
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/20" />
+
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/85" />
+
+        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-5 px-6 pb-16 text-center sm:pb-24">
+          <h1 className="font-serif text-4xl font-semibold leading-tight text-white sm:text-5xl">
+            Chicha livrée chez vous
+          </h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/70 sm:text-sm">
+            45 min · 7j/7 · 18h — 3h
+          </p>
+          <Link
+            href="/commande"
+            className="mt-2 rounded-full bg-signal px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg transition-colors hover:bg-signal-hover"
+          >
+            Commander
+          </Link>
+        </div>
       </section>
+
+      <div id="hero-sentinel" aria-hidden="true" className="h-px w-full" />
 
       <a
         href={`https://wa.me/${SERVICE_WHATSAPP_NUMBER}`}
@@ -48,24 +69,89 @@ export default function Home() {
         </svg>
       </a>
 
-      <Link
-        href="/commande"
-        className="fixed bottom-6 right-6 z-30 rounded-full bg-brand px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-lg transition-colors hover:bg-brand-soft sm:bottom-10 sm:right-10"
-      >
-        Commander
-      </Link>
+      {/* PROCESS */}
+      <section className="relative overflow-hidden bg-background">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.4]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #e5e3de 1px, transparent 1px), linear-gradient(to bottom, #e5e3de 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent)",
+          }}
+        />
+        <div className="relative mx-auto max-w-4xl px-6 py-20 sm:px-8 sm:py-28">
+          <div className="divide-y divide-border border-t border-border">
+            {PROCESS.map((step) => (
+              <div
+                key={step.n}
+                className="grid grid-cols-1 gap-2 py-8 sm:grid-cols-[5rem_1fr_1.4fr] sm:items-baseline sm:gap-8"
+              >
+                <span className="font-serif text-lg text-signal">{step.n}</span>
+                <h2 className="font-serif text-2xl font-semibold text-ink">
+                  {step.title}
+                </h2>
+                <p className="text-sm leading-relaxed text-muted">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <section className="bg-cream">
-        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-10 px-6 py-16 sm:grid-cols-3">
-          {steps.map((step) => (
-            <div key={step.title} className="flex flex-col items-center text-center">
-              <span className="text-3xl">{step.emoji}</span>
-              <h2 className="mt-3 font-serif text-lg font-semibold text-brand">
-                {step.title}
+      {/* HIGHLIGHTS */}
+      <section className="bg-secondary">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:px-8">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
+                Dans le menu
+              </span>
+              <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-ink">
+                Ça se commande avec
               </h2>
-              <p className="mt-1 text-sm text-brand/60">{step.desc}</p>
             </div>
-          ))}
+            <Link
+              href="/commande"
+              className="hidden text-xs font-semibold uppercase tracking-[0.15em] text-signal hover:text-signal-hover sm:block"
+            >
+              Voir tout le menu →
+            </Link>
+          </div>
+
+          <div className="mt-8 -mx-6 flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:-mx-8 sm:px-8">
+            {highlights.map((product) => (
+              <Link
+                key={product.id}
+                href="/commande"
+                className="group w-36 flex-shrink-0 snap-start sm:w-44"
+              >
+                <div className="aspect-square overflow-hidden rounded-2xl bg-white">
+                  {product.image && (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={200}
+                      height={200}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  )}
+                </div>
+                <p className="mt-3 truncate text-sm font-medium text-ink">
+                  {product.name}
+                </p>
+                <p className="font-mono text-xs font-semibold text-signal">
+                  {product.price.toFixed(2)} €
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <Link
+            href="/commande"
+            className="mt-6 block text-center text-xs font-semibold uppercase tracking-[0.15em] text-signal hover:text-signal-hover sm:hidden"
+          >
+            Voir tout le menu →
+          </Link>
         </div>
       </section>
     </main>

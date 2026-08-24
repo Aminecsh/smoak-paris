@@ -67,7 +67,7 @@ export default function TrackingMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {route && route.length > 1 && (
-        <Polyline positions={route} pathOptions={{ color: "#2b1810", weight: 4, opacity: 0.6 }} />
+        <Polyline positions={route} pathOptions={{ color: "#8B5CF6", weight: 4, opacity: 0.7 }} />
       )}
       {driver && (
         <Marker position={[driver.lat, driver.lng]} icon={driverIcon}>

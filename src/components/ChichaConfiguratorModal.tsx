@@ -101,23 +101,23 @@ export default function ChichaConfiguratorModal({
         className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white sm:max-w-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-brand/10 p-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-cream text-2xl">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-secondary text-2xl">
               {chicha.emoji}
             </div>
             <div>
-              <h2 className="font-serif text-lg font-semibold text-brand">
+              <h2 className="font-serif text-lg font-semibold text-ink">
                 {chicha.name}
               </h2>
-              <p className="text-sm text-brand/60">{chicha.description}</p>
+              <p className="text-sm text-muted">{chicha.description}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Fermer"
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-brand/50 hover:bg-cream hover:text-brand"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-muted hover:bg-secondary hover:text-ink"
           >
             ✕
           </button>
@@ -126,8 +126,8 @@ export default function ChichaConfiguratorModal({
         <div className="flex-1 overflow-y-auto p-5">
           {/* Goût */}
           <section>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
-              Choix du goût <span className="text-brand/30">— obligatoire</span>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+              Choix du goût <span className="text-muted">— obligatoire</span>
             </h3>
             <div className="mt-3 flex flex-col gap-2">
               {chichaFlavors.map((flavor) => (
@@ -135,8 +135,8 @@ export default function ChichaConfiguratorModal({
                   key={flavor.id}
                   className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
                     flavorId === flavor.id
-                      ? "border-brand bg-cream"
-                      : "border-brand/10 hover:bg-cream/60"
+                      ? "border-signal bg-secondary"
+                      : "border-border hover:bg-secondary/60"
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function ChichaConfiguratorModal({
                       height={40}
                       className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
                     />
-                    <span className="text-brand">{flavor.name}</span>
+                    <span className="text-ink">{flavor.name}</span>
                   </span>
                   <input
                     type="radio"
@@ -155,7 +155,7 @@ export default function ChichaConfiguratorModal({
                     value={flavor.id}
                     checked={flavorId === flavor.id}
                     onChange={() => setFlavorId(flavor.id)}
-                    className="h-4 w-4 flex-shrink-0 accent-brand"
+                    className="h-4 w-4 flex-shrink-0 accent-signal"
                   />
                 </label>
               ))}
@@ -164,11 +164,11 @@ export default function ChichaConfiguratorModal({
 
           {/* Supplément chicha */}
           <section className="mt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               Supplément chicha
             </h3>
             <div className="mt-3 flex flex-col gap-2">
-              <label className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60">
+              <label className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm hover:bg-secondary/60">
                 <span className="flex items-start gap-3">
                   <Image
                     src={rechargeSupplement.image}
@@ -178,13 +178,13 @@ export default function ChichaConfiguratorModal({
                     className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
                   />
                   <span>
-                    <span className="text-brand">
+                    <span className="text-ink">
                       {rechargeSupplement.name}
-                      <span className="ml-2 font-mono text-xs text-brand/50">
+                      <span className="ml-2 font-mono text-xs text-muted">
                         +{rechargeSupplement.price.toFixed(2)} €
                       </span>
                     </span>
-                    <span className="mt-0.5 block text-xs text-brand/50">
+                    <span className="mt-0.5 block text-xs text-muted">
                       {rechargeSupplement.description}
                     </span>
                   </span>
@@ -193,14 +193,14 @@ export default function ChichaConfiguratorModal({
                   type="checkbox"
                   checked={recharge}
                   onChange={(e) => setRecharge(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 flex-shrink-0 accent-brand"
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 accent-signal"
                 />
               </label>
 
-              <label className="flex cursor-pointer items-center justify-between rounded-lg border border-brand/10 px-4 py-2.5 text-sm hover:bg-cream/60">
-                <span className="text-brand">
+              <label className="flex cursor-pointer items-center justify-between rounded-lg border border-border px-4 py-2.5 text-sm hover:bg-secondary/60">
+                <span className="text-ink">
                   {charcoalSupplement.name}
-                  <span className="ml-2 font-mono text-xs text-brand/50">
+                  <span className="ml-2 font-mono text-xs text-muted">
                     +{charcoalSupplement.price.toFixed(2)} €
                   </span>
                 </span>
@@ -208,7 +208,7 @@ export default function ChichaConfiguratorModal({
                   type="checkbox"
                   checked={extraCharcoal}
                   onChange={(e) => setExtraCharcoal(e.target.checked)}
-                  className="h-4 w-4 accent-brand"
+                  className="h-4 w-4 accent-signal"
                 />
               </label>
             </div>
@@ -216,7 +216,7 @@ export default function ChichaConfiguratorModal({
 
           {/* Boisson */}
           <section className="mt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               Boisson
             </h3>
             <div className="mt-3 flex flex-col gap-2">
@@ -225,7 +225,7 @@ export default function ChichaConfiguratorModal({
                 return (
                   <div
                     key={drink.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-brand/10 px-4 py-2.5 text-sm"
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       {drink.image && (
@@ -237,9 +237,9 @@ export default function ChichaConfiguratorModal({
                           className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
                         />
                       )}
-                      <span className="truncate text-brand">
+                      <span className="truncate text-ink">
                         {drink.name}
-                        <span className="ml-2 font-mono text-xs text-brand/50">
+                        <span className="ml-2 font-mono text-xs text-muted">
                           +{drink.price.toFixed(2)} €
                         </span>
                       </span>
@@ -250,18 +250,18 @@ export default function ChichaConfiguratorModal({
                         onClick={() => adjustQuantity(setDrinkQuantities, drink.id, -1)}
                         disabled={qty === 0}
                         aria-label={`Retirer ${drink.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-brand/20 text-brand hover:bg-cream disabled:opacity-30"
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-ink hover:bg-secondary disabled:opacity-30"
                       >
                         −
                       </button>
-                      <span className="w-4 text-center font-mono text-sm text-brand">
+                      <span className="w-4 text-center font-mono text-sm text-ink">
                         {qty}
                       </span>
                       <button
                         type="button"
                         onClick={() => adjustQuantity(setDrinkQuantities, drink.id, 1)}
                         aria-label={`Ajouter ${drink.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-soft"
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
                       >
                         +
                       </button>
@@ -274,7 +274,7 @@ export default function ChichaConfiguratorModal({
 
           {/* Sucreries */}
           <section className="mt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               Sucreries
             </h3>
             <div className="mt-3 flex flex-col gap-2">
@@ -283,7 +283,7 @@ export default function ChichaConfiguratorModal({
                 return (
                   <div
                     key={sweet.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-brand/10 px-4 py-2.5 text-sm"
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       {sweet.image && (
@@ -295,9 +295,9 @@ export default function ChichaConfiguratorModal({
                           className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
                         />
                       )}
-                      <span className="truncate text-brand">
+                      <span className="truncate text-ink">
                         {sweet.name}
-                        <span className="ml-2 font-mono text-xs text-brand/50">
+                        <span className="ml-2 font-mono text-xs text-muted">
                           +{sweet.price.toFixed(2)} €
                         </span>
                       </span>
@@ -308,18 +308,18 @@ export default function ChichaConfiguratorModal({
                         onClick={() => adjustQuantity(setSweetQuantities, sweet.id, -1)}
                         disabled={qty === 0}
                         aria-label={`Retirer ${sweet.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-brand/20 text-brand hover:bg-cream disabled:opacity-30"
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-ink hover:bg-secondary disabled:opacity-30"
                       >
                         −
                       </button>
-                      <span className="w-4 text-center font-mono text-sm text-brand">
+                      <span className="w-4 text-center font-mono text-sm text-ink">
                         {qty}
                       </span>
                       <button
                         type="button"
                         onClick={() => adjustQuantity(setSweetQuantities, sweet.id, 1)}
                         aria-label={`Ajouter ${sweet.name}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-soft"
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-hover"
                       >
                         +
                       </button>
@@ -331,24 +331,24 @@ export default function ChichaConfiguratorModal({
           </section>
         </div>
 
-        <div className="flex items-center gap-3 border-t border-brand/10 p-5">
-          <div className="flex items-center gap-3 rounded-full border border-brand/20">
+        <div className="flex items-center gap-3 border-t border-border p-5">
+          <div className="flex items-center gap-3 rounded-full border border-border">
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               aria-label="Diminuer la quantité"
-              className="flex h-9 w-9 items-center justify-center text-brand hover:bg-cream"
+              className="flex h-9 w-9 items-center justify-center text-ink hover:bg-secondary"
             >
               −
             </button>
-            <span className="w-4 text-center font-mono text-sm text-brand">
+            <span className="w-4 text-center font-mono text-sm text-ink">
               {quantity}
             </span>
             <button
               type="button"
               onClick={() => setQuantity((q) => q + 1)}
               aria-label="Augmenter la quantité"
-              className="flex h-9 w-9 items-center justify-center text-brand hover:bg-cream"
+              className="flex h-9 w-9 items-center justify-center text-ink hover:bg-secondary"
             >
               +
             </button>
@@ -358,7 +358,7 @@ export default function ChichaConfiguratorModal({
             type="button"
             onClick={handleAdd}
             disabled={justAdded}
-            className="flex flex-1 items-center justify-between rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft disabled:opacity-70"
+            className="flex flex-1 items-center justify-between rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-70"
           >
             <span>{justAdded ? "Ajouté ✓" : "Ajouter au panier"}</span>
             <span className="font-mono">

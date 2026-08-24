@@ -78,8 +78,8 @@ export default function LivreurControls({
 
   return (
     <div className="mt-6 flex flex-col gap-4">
-      <div className="rounded-xl border border-brand/10 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+      <div className="rounded-xl border border-border p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
           Statut
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -91,8 +91,8 @@ export default function LivreurControls({
               onClick={() => updateStatus(s.key)}
               className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-colors disabled:opacity-50 ${
                 s.key === status
-                  ? "bg-brand text-white"
-                  : "border border-brand/20 text-brand hover:bg-cream"
+                  ? "bg-signal text-white"
+                  : "border border-border text-ink hover:bg-secondary"
               }`}
             >
               {s.label}
@@ -101,11 +101,11 @@ export default function LivreurControls({
         </div>
       </div>
 
-      <div className="rounded-xl border border-brand/10 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+      <div className="rounded-xl border border-border p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
           Position en direct
         </h2>
-        <p className="mt-2 text-sm text-brand/60">
+        <p className="mt-2 text-sm text-muted">
           Active le partage pendant la livraison, le client voit ta position sur sa
           page de suivi.
         </p>
@@ -115,7 +115,7 @@ export default function LivreurControls({
           className={`mt-3 w-full rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition-colors ${
             sharing
               ? "bg-red-600 text-white hover:bg-red-700"
-              : "bg-brand text-white hover:bg-brand-soft"
+              : "bg-signal text-white hover:bg-signal-hover"
           }`}
         >
           {sharing ? "Arrêter le partage" : "Partager ma position"}

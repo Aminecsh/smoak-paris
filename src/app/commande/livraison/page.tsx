@@ -115,15 +115,15 @@ export default function LivraisonPage() {
   if (isEmpty) {
     return (
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-16 text-center sm:px-6">
-        <h1 className="font-serif text-2xl font-semibold text-brand">
+        <h1 className="font-serif text-2xl font-semibold text-ink">
           Votre panier est vide
         </h1>
-        <p className="mt-2 text-sm text-brand/60">
+        <p className="mt-2 text-sm text-muted">
           Ajoutez des produits avant de passer commande.
         </p>
         <Link
           href="/commande"
-          className="mt-6 inline-block rounded-full bg-brand px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-soft"
+          className="mt-6 inline-block rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover"
         >
           Retour au menu
         </Link>
@@ -133,21 +133,21 @@ export default function LivraisonPage() {
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-3xl font-semibold tracking-tight text-brand">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">
         Livraison
       </h1>
-      <p className="mt-1 text-sm text-brand/60">
+      <p className="mt-1 text-sm text-muted">
         Renseignez vos coordonnées, paiement à la livraison.
       </p>
 
-      <div className="mt-6 rounded-xl border border-brand/10 bg-cream p-4">
-        <ul className="flex flex-col gap-1.5 text-sm text-brand/70">
+      <div className="mt-6 rounded-xl border border-border bg-white p-4">
+        <ul className="flex flex-col gap-1.5 text-sm text-muted">
           {configuredChichas.map((c) => (
             <li key={c.id} className="flex justify-between gap-2">
               <span className="truncate">
                 {c.quantity} × {c.chichaName} — {c.flavorName}
               </span>
-              <span className="flex-shrink-0 font-mono">
+              <span className="flex-shrink-0 font-mono font-semibold text-signal">
                 {(c.unitPrice * c.quantity).toFixed(2)} €
               </span>
             </li>
@@ -160,16 +160,16 @@ export default function LivraisonPage() {
                 <span className="truncate">
                   {item.quantity} × {product.name}
                 </span>
-                <span className="flex-shrink-0 font-mono">
+                <span className="flex-shrink-0 font-mono font-semibold text-signal">
                   {(product.price * item.quantity).toFixed(2)} €
                 </span>
               </li>
             );
           })}
         </ul>
-        <div className="mt-3 flex items-center justify-between border-t border-brand/10 pt-3">
-          <span className="text-sm font-medium text-brand/70">Total</span>
-          <span className="font-mono text-lg font-bold text-brand">
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-medium text-muted">Total</span>
+          <span className="font-mono text-lg font-bold text-signal">
             {totalPrice.toFixed(2)} €
           </span>
         </div>
@@ -178,31 +178,31 @@ export default function LivraisonPage() {
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
               Prénom
             </label>
             <input
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+              className="mt-1 w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+            <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
               Nom
             </label>
             <input
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+              className="mt-1 w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Email
           </label>
           <input
@@ -210,19 +210,19 @@ export default function LivraisonPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Téléphone
           </label>
           <div className="mt-1 flex gap-2">
             <select
               value={dialCode}
               onChange={(e) => setDialCode(e.target.value)}
-              className="rounded-lg border border-brand/20 bg-white px-2 py-2.5 text-sm text-brand"
+              className="rounded-lg border border-border bg-white px-2 py-2.5 text-sm text-ink"
             >
               {COUNTRY_OPTIONS.map((c) => (
                 <option key={c.code} value={c.dialCode}>
@@ -237,13 +237,13 @@ export default function LivraisonPage() {
               value={formatNationalNumber(phoneDigits)}
               onChange={(e) => setPhoneDigits(e.target.value.replace(/\D/g, ""))}
               placeholder="6 12 34 56 78"
-              className="w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+              className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Adresse
           </label>
           <div className="mt-1">
@@ -257,7 +257,7 @@ export default function LivraisonPage() {
               placeholder="Numéro et rue"
             />
           </div>
-          <p className="mt-1 text-xs text-brand/40">
+          <p className="mt-1 text-xs text-muted">
             Choisis une adresse dans la liste proposée — livraison en Île-de-France
             uniquement.
           </p>
@@ -266,30 +266,30 @@ export default function LivraisonPage() {
         {addressSelection && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                 Code postal
               </label>
               <input
                 readOnly
                 value={addressSelection.postalCode}
-                className="mt-1 w-full rounded-lg border border-brand/10 bg-cream px-4 py-2.5 text-sm text-brand/70"
+                className="mt-1 w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-muted"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                 Ville
               </label>
               <input
                 readOnly
                 value={addressSelection.city}
-                className="mt-1 w-full rounded-lg border border-brand/10 bg-cream px-4 py-2.5 text-sm text-brand/70"
+                className="mt-1 w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-muted"
               />
             </div>
           </div>
         )}
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Créneau de livraison
           </label>
           <div className="mt-1 grid grid-cols-4 gap-2">
@@ -298,8 +298,8 @@ export default function LivraisonPage() {
                 key={slot}
                 className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
                   deliverySlot === slot
-                    ? "border-brand bg-cream text-brand"
-                    : "border-brand/20 text-brand/70"
+                    ? "border-signal bg-secondary text-ink"
+                    : "border-border text-muted"
                 }`}
               >
                 <input
@@ -314,7 +314,7 @@ export default function LivraisonPage() {
               </label>
             ))}
           </div>
-          <p className="mt-2 text-xs text-brand/40">
+          <p className="mt-2 text-xs text-muted">
             La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
             {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
             {LAST_RETURN_LABEL}).
@@ -322,27 +322,27 @@ export default function LivraisonPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Note pour le livreur (optionnel)
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            className="mt-1 w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+            className="mt-1 w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-brand/50">
+          <label className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
             Paiement à la livraison
           </label>
           <div className="mt-1 grid grid-cols-2 gap-3">
             <label
               className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm ${
                 paymentMethod === "cb"
-                  ? "border-brand bg-cream text-brand"
-                  : "border-brand/20 text-brand/70"
+                  ? "border-signal bg-secondary text-ink"
+                  : "border-border text-muted"
               }`}
             >
               <input
@@ -351,15 +351,15 @@ export default function LivraisonPage() {
                 value="cb"
                 checked={paymentMethod === "cb"}
                 onChange={() => setPaymentMethod("cb")}
-                className="h-4 w-4 accent-brand"
+                className="h-4 w-4 accent-signal"
               />
               Carte bancaire
             </label>
             <label
               className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm ${
                 paymentMethod === "especes"
-                  ? "border-brand bg-cream text-brand"
-                  : "border-brand/20 text-brand/70"
+                  ? "border-signal bg-secondary text-ink"
+                  : "border-border text-muted"
               }`}
             >
               <input
@@ -368,7 +368,7 @@ export default function LivraisonPage() {
                 value="especes"
                 checked={paymentMethod === "especes"}
                 onChange={() => setPaymentMethod("especes")}
-                className="h-4 w-4 accent-brand"
+                className="h-4 w-4 accent-signal"
               />
               Espèces
             </label>
@@ -384,7 +384,7 @@ export default function LivraisonPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-2 w-full rounded-full bg-brand px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft disabled:opacity-60"
+          className="mt-2 w-full rounded-full bg-signal px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
         >
           {submitting ? "Envoi..." : `Confirmer la commande — ${totalPrice.toFixed(2)} €`}
         </button>

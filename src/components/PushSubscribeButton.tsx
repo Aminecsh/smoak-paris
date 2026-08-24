@@ -88,7 +88,7 @@ export default function PushSubscribeButton() {
 
   if (status === "on") {
     return (
-      <p className="mb-4 text-xs font-medium text-brand/50">
+      <p className="mb-4 text-xs font-medium text-muted">
         Notifications activées sur cet appareil ✅
       </p>
     );
@@ -96,7 +96,7 @@ export default function PushSubscribeButton() {
 
   if (status === "needs-install") {
     return (
-      <p className="mb-4 rounded-lg border border-brand/10 bg-cream p-3 text-xs text-brand/60">
+      <p className="mb-4 rounded-lg border border-border bg-secondary p-3 text-xs text-muted">
         Pour recevoir les notifications sur iPhone : ouvre ce site dans Safari,
         appuie sur le bouton Partager, puis « Sur l&apos;écran d&apos;accueil ».
         Reviens ensuite ici depuis l&apos;icône ajoutée.
@@ -106,7 +106,7 @@ export default function PushSubscribeButton() {
 
   if (status === "denied") {
     return (
-      <p className="mb-4 text-xs text-brand/50">
+      <p className="mb-4 text-xs text-muted">
         Notifications bloquées — autorise-les dans les réglages de ton
         navigateur pour ce site.
       </p>
@@ -122,7 +122,7 @@ export default function PushSubscribeButton() {
       <button
         type="button"
         onClick={subscribe}
-        className="rounded-full bg-brand px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-soft"
+        className="rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-signal-hover"
       >
         Activer les notifications de commande
       </button>

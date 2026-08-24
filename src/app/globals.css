@@ -1,20 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #2b1810;
+  --background: #fafaf8;
+  --foreground: #111111;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-montserrat);
-  --font-serif: var(--font-archivo);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-sora);
 
-  --color-brand: #2b1810;
-  --color-brand-soft: #43291b;
-  --color-cream: #f6efe4;
-  --color-cream-dark: #ece1cf;
+  --color-ink: #111111;
+  --color-muted: #8a8a85;
+  --color-border: #e5e3de;
+  --color-surface: #fafaf8;
+  --color-secondary: #f0efec;
+  --color-signal: #8b5cf6;
+  --color-signal-hover: #7c3aed;
 }
 
 body {
@@ -25,8 +28,8 @@ body {
 
 /* Hors des layers Tailwind pour primer sur les utilitaires de poids/tracking
    posés à côté (ex: font-serif font-semibold) — c'est voulu : les grands
-   titres doivent rester en 400 avec ce tracking serré. */
+   titres restent en 600 avec ce tracking serré (voix Sora). */
 .font-serif {
-  font-weight: 400;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }

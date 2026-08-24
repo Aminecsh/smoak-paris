@@ -55,14 +55,14 @@ export default function ResendTrackingLink({
 
   if (channel === "whatsapp") {
     return (
-      <p className="mt-2 text-xs text-brand/50">
+      <p className="mt-2 text-xs text-muted">
         Lien de suivi envoyé sur WhatsApp ✅
       </p>
     );
   }
 
   return (
-    <div className="mt-2 rounded-lg border border-brand/10 bg-white p-3 text-xs text-brand/60">
+    <div className="mt-2 rounded-lg border border-border bg-white p-3 text-xs text-muted">
       {channel === "email" ? (
         <p>Pas de WhatsApp trouvé — le lien de suivi vous a été envoyé par email.</p>
       ) : (
@@ -73,7 +73,7 @@ export default function ResendTrackingLink({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="mt-2 font-semibold text-brand underline"
+          className="mt-2 font-semibold text-ink underline"
         >
           Mauvais numéro ? Corrige-le
         </button>
@@ -83,7 +83,7 @@ export default function ResendTrackingLink({
             <select
               value={dialCode}
               onChange={(e) => setDialCode(e.target.value)}
-              className="rounded-lg border border-brand/20 bg-white px-2 py-2 text-sm text-brand"
+              className="rounded-lg border border-border bg-white px-2 py-2 text-sm text-ink"
             >
               {COUNTRY_OPTIONS.map((c) => (
                 <option key={c.code} value={c.dialCode}>
@@ -97,14 +97,14 @@ export default function ResendTrackingLink({
               value={formatNationalNumber(phoneDigits)}
               onChange={(e) => setPhoneDigits(e.target.value.replace(/\D/g, ""))}
               placeholder="6 12 34 56 78"
-              className="w-full rounded-lg border border-brand/20 bg-white px-3 py-2 text-sm text-brand"
+              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-ink"
             />
           </div>
           <button
             type="button"
             onClick={handleCorrect}
             disabled={submitting}
-            className="rounded-full bg-brand px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-soft disabled:opacity-60"
+            className="rounded-full bg-signal px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover disabled:opacity-60"
           >
             {submitting ? "Envoi..." : "Renvoyer le lien"}
           </button>

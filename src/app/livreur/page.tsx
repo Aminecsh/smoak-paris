@@ -38,10 +38,10 @@ export default async function LivreurPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-3xl font-semibold tracking-tight text-brand">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">
         Commandes en cours
       </h1>
-      <p className="mt-1 text-sm text-brand/60">
+      <p className="mt-1 text-sm text-muted">
         {orders?.length ?? 0} commande(s) à traiter.
       </p>
 
@@ -54,22 +54,22 @@ export default async function LivreurPage() {
           <li key={order.id}>
             <Link
               href={`/livreur/${order.id}`}
-              className="flex items-center justify-between gap-3 rounded-xl border border-brand/10 bg-cream p-4 hover:border-brand/30"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-white p-4 hover:border-signal"
             >
               <div className="min-w-0">
-                <p className="font-serif font-semibold text-brand">
+                <p className="font-serif font-semibold text-ink">
                   Commande n° {formatOrderReference(order.order_number)} —{" "}
                   {order.customer_name}
                 </p>
-                <p className="truncate text-sm text-brand/60">
+                <p className="truncate text-sm text-muted">
                   {order.delivery_address}
                 </p>
               </div>
               <div className="flex-shrink-0 text-right">
-                <span className="block rounded-full bg-brand/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-brand">
+                <span className="block rounded-full bg-secondary px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink">
                   {STATUS_LABELS[order.status] ?? order.status}
                 </span>
-                <span className="mt-1 block font-mono text-sm text-brand">
+                <span className="mt-1 block font-mono text-sm font-semibold text-signal">
                   {order.total_price.toFixed(2)} €
                 </span>
               </div>
@@ -77,7 +77,7 @@ export default async function LivreurPage() {
           </li>
         ))}
         {(orders ?? []).length === 0 && (
-          <p className="text-sm text-brand/50">Aucune commande en cours.</p>
+          <p className="text-sm text-muted">Aucune commande en cours.</p>
         )}
       </ul>
     </main>

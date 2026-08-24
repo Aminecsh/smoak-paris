@@ -65,24 +65,24 @@ export default async function LivreurOrderPage(
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-2xl font-semibold text-brand">
+      <h1 className="font-serif text-2xl font-semibold text-ink">
         Commande n° {formatOrderReference(order.order_number)}
       </h1>
 
-      <div className="mt-4 rounded-xl border border-brand/10 bg-cream p-5">
-        <p className="text-sm font-medium text-brand">{order.customer_name}</p>
-        <p className="text-sm text-brand/70">{order.customer_phone}</p>
-        <p className="text-sm text-brand/70">{order.delivery_address}</p>
+      <div className="mt-4 rounded-xl border border-border bg-white p-5">
+        <p className="text-sm font-medium text-ink">{order.customer_name}</p>
+        <p className="text-sm text-muted">{order.customer_phone}</p>
+        <p className="text-sm text-muted">{order.delivery_address}</p>
         {order.delivery_zone && (
-          <p className="mt-1 text-xs text-brand/40">
+          <p className="mt-1 text-xs text-muted">
             Secteur : {DELIVERY_ZONE_LABELS[order.delivery_zone]}
           </p>
         )}
         {order.delivery_note && (
-          <p className="mt-2 text-xs text-brand/50">Note : {order.delivery_note}</p>
+          <p className="mt-2 text-xs text-muted">Note : {order.delivery_note}</p>
         )}
         {order.delivery_slot && (
-          <p className="mt-2 text-sm font-medium text-brand">
+          <p className="mt-2 text-sm font-medium text-ink">
             {order.early_return_slot
               ? `Reprise anticipée demandée à ${formatSlotLabel(order.early_return_slot)}`
               : `Reprise prévue à ${getReturnTimeLabel(order.delivery_slot)}`}
@@ -90,26 +90,26 @@ export default async function LivreurOrderPage(
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-brand/10 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+      <div className="mt-4 rounded-xl border border-border p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
           Contenu
         </h2>
-        <ul className="mt-3 flex flex-col gap-1.5 text-sm text-brand/70">
+        <ul className="mt-3 flex flex-col gap-1.5 text-sm text-muted">
           {(items ?? []).map((item) => (
             <li key={item.id}>
               {item.quantity} × {item.name}
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex items-center justify-between border-t border-brand/10 pt-3">
-          <span className="text-sm font-medium text-brand/70">Total</span>
-          <span className="font-mono text-lg font-bold text-brand">
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-medium text-muted">Total</span>
+          <span className="font-mono text-lg font-bold text-signal">
             {order.total_price.toFixed(2)} €
           </span>
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-brand/70">Paiement</span>
-          <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand">
+          <span className="text-sm font-medium text-muted">Paiement</span>
+          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink">
             {PAYMENT_LABELS[order.payment_method] ?? order.payment_method}
           </span>
         </div>

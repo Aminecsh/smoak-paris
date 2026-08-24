@@ -32,8 +32,8 @@ export default function StockLogin() {
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16 sm:px-6">
-      <h1 className="font-serif text-2xl font-semibold text-brand">Gestion des stocks</h1>
-      <p className="mt-1 text-sm text-brand/60">Accès protégé.</p>
+      <h1 className="font-serif text-2xl font-semibold text-ink">Gestion des stocks</h1>
+      <p className="mt-1 text-sm text-muted">Accès protégé.</p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
         <input
@@ -43,7 +43,7 @@ export default function StockLogin() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Mot de passe"
-          className="w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+          className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
         />
         {error && (
           <p className="text-sm text-red-600" role="alert">
@@ -53,7 +53,7 @@ export default function StockLogin() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-brand px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-brand-soft disabled:opacity-60"
+          className="rounded-full bg-signal px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-signal-hover disabled:opacity-60"
         >
           {submitting ? "..." : "Entrer"}
         </button>

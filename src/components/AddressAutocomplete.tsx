@@ -87,10 +87,10 @@ export default function AddressAutocomplete({
         }}
         placeholder={placeholder ?? "Numéro et rue"}
         autoComplete="off"
-        className="w-full rounded-lg border border-brand/20 bg-white px-4 py-2.5 text-sm text-brand"
+        className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-ink"
       />
       {open && (
-        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-brand/10 bg-white shadow-lg">
+        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-border bg-white shadow-lg">
           {suggestions.length > 0 ? (
             suggestions.map((s, i) => (
               <li key={`${s.lat}-${s.lng}`}>
@@ -98,8 +98,8 @@ export default function AddressAutocomplete({
                   type="button"
                   onClick={() => pick(s)}
                   onMouseEnter={() => setHighlighted(i)}
-                  className={`block w-full px-4 py-2 text-left text-sm text-brand ${
-                    i === highlighted ? "bg-cream" : "hover:bg-cream"
+                  className={`block w-full px-4 py-2 text-left text-sm text-ink ${
+                    i === highlighted ? "bg-secondary" : "hover:bg-secondary"
                   }`}
                 >
                   {s.streetLine}, {s.postalCode} {s.city}
@@ -107,7 +107,7 @@ export default function AddressAutocomplete({
               </li>
             ))
           ) : (
-            <li className="px-4 py-2 text-sm text-brand/50">
+            <li className="px-4 py-2 text-sm text-muted">
               Aucune adresse trouvée en Île-de-France
             </li>
           )}

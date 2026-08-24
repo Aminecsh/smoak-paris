@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
-import { Archivo, Montserrat } from "next/font/google";
+import { Sora, Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MainShell from "@/components/MainShell";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["500", "600", "700"],
 });
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Smoak Paris — Chicha à domicile",
-  description: "Chicha premium livrée chez vous à Paris.",
+  title: "Smoak Paris — Livraison chicha express",
+  description: "Chicha premium livrée chez vous en moins d'une heure, à Paris.",
   manifest: "/manifest.json",
 };
 
@@ -27,12 +28,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${archivo.variable} ${montserrat.variable} h-full antialiased`}
+      className={`${sora.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-white text-brand">
+      <body className="flex min-h-full flex-col bg-background text-ink">
         <CartProvider>
           <Header />
-          {children}
+          <MainShell>{children}</MainShell>
           <Footer />
         </CartProvider>
       </body>

@@ -15,17 +15,17 @@ export default function CommandePage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="font-serif text-3xl font-semibold tracking-tight text-brand">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">
         Le menu
       </h1>
-      <p className="mt-1 text-sm text-brand/60">
+      <p className="mt-1 text-sm text-muted">
         Composez votre commande, le total se met à jour en temps réel.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="flex flex-col gap-8 lg:col-span-2">
           <section>
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               Chicha
             </h2>
             <div className="flex flex-col gap-3">
@@ -41,7 +41,7 @@ export default function CommandePage() {
 
           {categories.map((category) => (
             <section key={category}>
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-brand/50">
+              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-muted">
                 {category}
               </h2>
               <div className="flex flex-col gap-3">
