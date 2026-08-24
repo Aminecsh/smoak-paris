@@ -10,14 +10,14 @@ export const chichaBases: ChichaBase[] = [
     id: "quasar",
     name: "Quasar",
     description: "1 chicha Quasar, goût, charbon, briquet, embout plastique.",
-    price: 24.9,
+    price: 30,
     emoji: "🌌",
   },
   {
     id: "khaloud",
     name: "Khaloud",
     description: "Notre chicha intense, pour les amateurs de saveurs corsées.",
-    price: 24.9,
+    price: 30,
     emoji: "🔥",
   },
 ];
@@ -35,22 +35,16 @@ export const rechargeSupplement: ChichaSupplement & {
   image: string;
 } = {
   id: "recharge",
-  name: "Recharge",
+  name: "Tête en plus",
   description: "Charbon, briquet et goût inclus.",
-  price: 8.9,
+  price: 15,
   image: "/produits/Recharge.png",
 };
 
 export const charcoalSupplement: ChichaSupplement = {
   id: "charbon-supplement",
-  name: "Charbon en plus",
-  price: 2.9,
-};
-
-export const extraFlavorSupplement: ChichaSupplement = {
-  id: "gout-supplement",
-  name: "Goût supplémentaire",
-  price: 3.9,
+  name: "Pack de charbon",
+  price: 5,
 };
 
 // Les boissons proposables en supplément dans le composeur : le même

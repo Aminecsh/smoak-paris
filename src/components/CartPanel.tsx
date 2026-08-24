@@ -4,6 +4,19 @@ import Link from "next/link";
 import { products } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 
+// Les boissons/sucreries d'une chicha sont stockées en lignes répétées (une
+// entrée par unité) — on les regroupe ici pour l'affichage ("2× Coca-Cola"
+// plutôt que deux lignes identiques).
+function groupSupplementLines(lines: { id: string; name: string }[]) {
+  const grouped = new Map<string, { name: string; quantity: number }>();
+  for (const line of lines) {
+    const existing = grouped.get(line.id);
+    if (existing) existing.quantity += 1;
+    else grouped.set(line.id, { name: line.name, quantity: 1 });
+  }
+  return Array.from(grouped.entries()).map(([id, value]) => ({ id, ...value }));
+}
+
 export default function CartPanel() {
   const {
     items,
@@ -53,16 +66,19 @@ export default function CartPanel() {
                     {chicha.chichaName} — {chicha.flavorName}
                   </p>
                   <ul className="mt-0.5 text-xs text-brand/50">
-                    {chicha.recharge && <li>+ Recharge</li>}
-                    {chicha.extraCharcoal && <li>+ Charbon en plus</li>}
-                    {chicha.extraFlavorName && (
-                      <li>+ Goût supplémentaire : {chicha.extraFlavorName}</li>
-                    )}
-                    {chicha.drinks.map((drink) => (
-                      <li key={drink.id}>+ {drink.name}</li>
+                    {chicha.recharge && <li>+ Tête en plus</li>}
+                    {chicha.extraCharcoal && <li>+ Pack de charbon</li>}
+                    {groupSupplementLines(chicha.drinks).map((drink) => (
+                      <li key={drink.id}>
+                        + {drink.quantity > 1 ? `${drink.quantity}× ` : ""}
+                        {drink.name}
+                      </li>
                     ))}
-                    {chicha.sweets.map((sweet) => (
-                      <li key={sweet.id}>+ {sweet.name}</li>
+                    {groupSupplementLines(chicha.sweets).map((sweet) => (
+                      <li key={sweet.id}>
+                        + {sweet.quantity > 1 ? `${sweet.quantity}× ` : ""}
+                        {sweet.name}
+                      </li>
                     ))}
                   </ul>
                   <p className="mt-1 font-mono text-xs text-brand/50">

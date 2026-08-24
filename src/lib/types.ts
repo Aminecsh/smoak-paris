@@ -47,8 +47,6 @@ export interface ConfiguredChichaItem {
   flavorName: string;
   recharge: boolean;
   extraCharcoal: boolean;
-  extraFlavorId: string | null;
-  extraFlavorName: string | null;
   drinks: ChichaSupplementLine[];
   sweets: ChichaSupplementLine[];
   unitPrice: number;

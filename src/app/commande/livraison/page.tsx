@@ -92,7 +92,6 @@ export default function LivraisonPage() {
             flavorId: c.flavorId,
             recharge: c.recharge,
             extraCharcoal: c.extraCharcoal,
-            extraFlavorId: c.extraFlavorId,
             drinkIds: c.drinks.map((d) => d.id),
             sweetIds: c.sweets.map((s) => s.id),
             quantity: c.quantity,

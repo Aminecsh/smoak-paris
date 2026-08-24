@@ -4,7 +4,6 @@ import {
   chichaFlavors,
   rechargeSupplement,
   charcoalSupplement,
-  extraFlavorSupplement,
   drinkSupplements,
   sweetSupplements,
 } from "@/lib/chicha";
@@ -19,7 +18,6 @@ export interface ConfiguredChichaInput {
   flavorId: string;
   recharge?: boolean;
   extraCharcoal?: boolean;
-  extraFlavorId?: string | null;
   drinkIds?: string[];
   sweetIds?: string[];
   quantity: number;
@@ -93,9 +91,6 @@ export function buildOrder(payload: {
     if (!flavor) {
       return { error: `Goût inconnu : ${chicha.flavorId}` };
     }
-    const extraFlavor = chicha.extraFlavorId
-      ? chichaFlavors.find((f) => f.id === chicha.extraFlavorId)
-      : null;
     const drinks = (chicha.drinkIds ?? []).map((id) =>
       drinkSupplements.find((d) => d.id === id),
     );
@@ -113,7 +108,6 @@ export function buildOrder(payload: {
       base.price +
       (chicha.recharge ? rechargeSupplement.price : 0) +
       (chicha.extraCharcoal ? charcoalSupplement.price : 0) +
-      (extraFlavor ? extraFlavorSupplement.price : 0) +
       drinks.reduce((sum, d) => sum + (d?.price ?? 0), 0) +
       sweets.reduce((sum, s) => sum + (s?.price ?? 0), 0);
 
@@ -126,7 +120,6 @@ export function buildOrder(payload: {
         flavor: flavor.name,
         recharge: Boolean(chicha.recharge),
         extraCharcoal: Boolean(chicha.extraCharcoal),
-        extraFlavor: extraFlavor?.name ?? null,
         drinks: drinks.map((d) => d!.name),
         sweets: sweets.map((s) => s!.name),
       },
@@ -134,13 +127,6 @@ export function buildOrder(payload: {
 
     stockDecrements.push({ id: base.id, name: base.name, quantity: chicha.quantity });
     stockDecrements.push({ id: flavor.id, name: flavor.name, quantity: chicha.quantity });
-    if (extraFlavor) {
-      stockDecrements.push({
-        id: extraFlavor.id,
-        name: extraFlavor.name,
-        quantity: chicha.quantity,
-      });
-    }
     if (chicha.recharge) {
       stockDecrements.push({
         id: rechargeSupplement.id,
