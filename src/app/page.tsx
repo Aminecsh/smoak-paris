@@ -2,12 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
 import { products } from "@/lib/products";
+import { chichaBases } from "@/lib/chicha";
 import OrderTab from "@/components/OrderTab";
 
-const PROCESS = [
-  { n: "01", title: "Choisissez", desc: "Parcourez le menu et composez votre panier." },
-  { n: "02", title: "Commandez", desc: "Renseignez votre adresse et validez, paiement à la livraison." },
-  { n: "03", title: "Suivez", desc: "Votre livreur en temps réel sur la carte, jusqu'à votre porte." },
+const STATS: { value: string; label: string; withStar?: boolean; live?: boolean }[] = [
+  { value: "38 min", label: "Délai moyen" },
+  { value: "50 chichas", label: "Dans notre flotte" },
+  { value: "4.8/5", label: "Avis Trustpilot", withStar: true },
+  { value: "180+", label: "Commandes livrées", live: true },
+];
+
+const REVIEWS = [
+  { name: "Mehdi", place: "Paris 11e", quote: "Livré en 25 minutes un vendredi soir, franchement au top." },
+  { name: "Sarah", place: "Vincennes", quote: "Simple, rapide, et la chicha nickel montée dès l'arrivée." },
+  { name: "Yanis", place: "Paris 18e", quote: "Service pro, aucun jugement, le mec est resté hyper discret." },
+  { name: "Camille", place: "Montreuil", quote: "Ils repassent récupérer le matériel le lendemain sans embêter personne." },
 ];
 
 const HIGHLIGHT_IDS = [
@@ -57,36 +66,62 @@ export default function Home() {
         </svg>
       </a>
 
-      {/* PROCESS */}
-      <section className="relative overflow-hidden bg-background">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #e5e3de 1px, transparent 1px), linear-gradient(to bottom, #e5e3de 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent)",
-          }}
-        />
-        <div className="relative mx-auto max-w-4xl px-6 py-20 sm:px-8 sm:py-28">
-          <div className="divide-y divide-border border-t border-border">
-            {PROCESS.map((step) => (
-              <div
-                key={step.n}
-                className="grid grid-cols-1 gap-2 py-8 sm:grid-cols-[5rem_1fr_1.4fr] sm:items-baseline sm:gap-8"
-              >
-                <span className="font-serif text-lg text-signal">{step.n}</span>
-                <h2 className="font-serif text-2xl font-semibold text-ink">
-                  {step.title}
-                </h2>
-                <p className="text-sm leading-relaxed text-muted">{step.desc}</p>
+      {/* STATS */}
+      <section className="bg-secondary">
+        <div className="mx-auto max-w-6xl px-6 py-14 sm:px-8 sm:py-16">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 sm:gap-x-8">
+            {STATS.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                <p className="flex items-center gap-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
+                  {stat.live && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                    </span>
+                  )}
+                  {stat.withStar && (
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-signal">
+                      <path d="M10 1.5l2.6 5.4 5.9.7-4.3 4.1 1.1 5.9L10 14.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.7L10 1.5z" />
+                    </svg>
+                  )}
+                  {stat.value}
+                </p>
+                <p className="mt-2 text-xs font-medium uppercase tracking-[0.15em] text-muted">
+                  {stat.label}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* HIGHLIGHTS */}
+      {/* AVIS CLIENTS */}
+      <section className="bg-background">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:px-8">
+          <span className="block text-center text-xs font-semibold uppercase tracking-[0.3em] text-muted sm:text-left">
+            Ce qu&apos;ils en disent
+          </span>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {REVIEWS.map((review) => (
+              <div
+                key={review.name}
+                className="rounded-2xl border border-border bg-white p-6"
+              >
+                <p className="text-sm leading-relaxed text-ink">
+                  &ldquo;{review.quote}&rdquo;
+                </p>
+                <p className="mt-4 text-xs font-semibold text-ink">
+                  {review.name}
+                  <span className="ml-1.5 font-normal text-muted">— {review.place}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MENU */}
       <section className="bg-secondary">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:px-8">
           <div className="flex items-end justify-between gap-6">
@@ -95,7 +130,7 @@ export default function Home() {
                 Dans le menu
               </span>
               <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-ink">
-                Ça se commande avec
+                Le menu
               </h2>
             </div>
             <Link
@@ -106,37 +141,72 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="mt-8 -mx-6 flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:-mx-8 sm:px-8">
-            {highlights.map((product) => (
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {chichaBases.map((chicha) => (
               <Link
-                key={product.id}
-                href="/commande"
-                className="group w-36 flex-shrink-0 snap-start sm:w-44"
+                key={chicha.id}
+                href="/commande#chicha"
+                className="group relative flex aspect-[4/3] w-full flex-col overflow-hidden rounded-2xl"
               >
-                <div className="aspect-square overflow-hidden rounded-2xl bg-white">
-                  {product.image && (
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={200}
-                      height={200}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  )}
+                {chicha.image && (
+                  <Image
+                    src={chicha.image}
+                    alt=""
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/5" />
+                <div className="relative mt-auto flex flex-col p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="font-serif text-xl font-semibold text-white">
+                      {chicha.name}
+                    </h3>
+                    <span className="font-mono text-sm font-semibold text-white">
+                      dès {chicha.price.toFixed(2)} €
+                    </span>
+                  </div>
+                  <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-lg bg-white px-4 py-2 text-xs font-semibold text-ink transition-colors group-hover:bg-white/90">
+                    Composer
+                    <span aria-hidden="true">→</span>
+                  </span>
                 </div>
-                <p className="mt-3 truncate text-sm font-medium text-ink">
-                  {product.name}
-                </p>
-                <p className="font-mono text-xs font-semibold text-signal">
-                  {product.price.toFixed(2)} €
-                </p>
               </Link>
             ))}
           </div>
 
+          <div className="mt-10">
+            <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+              Boissons &amp; douceurs
+            </span>
+            <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
+              {highlights.slice(0, 6).map((product) => (
+                <Link key={product.id} href="/commande" className="group">
+                  <div className="aspect-square overflow-hidden rounded-xl bg-white">
+                    {product.image && (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        width={160}
+                        height={160}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    )}
+                  </div>
+                  <p className="mt-2 truncate text-xs font-medium text-ink">
+                    {product.name}
+                  </p>
+                  <p className="font-mono text-[11px] font-semibold text-signal">
+                    {product.price.toFixed(2)} €
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+
           <Link
             href="/commande"
-            className="mt-6 block text-center text-xs font-semibold uppercase tracking-[0.15em] text-signal hover:text-signal-hover sm:hidden"
+            className="mt-8 block text-center text-xs font-semibold uppercase tracking-[0.15em] text-signal hover:text-signal-hover sm:hidden"
           >
             Voir tout le menu →
           </Link>

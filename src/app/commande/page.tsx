@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import ChichaCard from "@/components/ChichaCard";
 import ChichaConfiguratorModal from "@/components/ChichaConfiguratorModal";
 import CartPanel from "@/components/CartPanel";
+import MobileCartButton from "@/components/MobileCartButton";
 
 function slugify(label: string) {
   return label
@@ -92,6 +93,8 @@ export default function CommandePage() {
           onClose={() => setOpenChichaId(null)}
         />
       )}
+
+      <MobileCartButton />
     </main>
   );
 }
