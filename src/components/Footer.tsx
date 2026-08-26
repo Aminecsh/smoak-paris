@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SERVICE_PHONE_DISPLAY, SERVICE_PHONE_NUMBER, SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
 import { DELIVERY_SLOTS, formatSlotLabel } from "@/lib/deliverySlots";
@@ -14,9 +15,13 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <span className="font-serif text-xl font-semibold text-white">
-              SMOAK <span className="text-white/50">PARIS</span>
-            </span>
+            <Image
+              src="/logo.png"
+              alt="Smoak Paris"
+              width={936}
+              height={491}
+              className="h-14 w-auto brightness-0 invert"
+            />
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/40">
               Chicha premium livrée chez vous, achetée et entretenue par
               notre équipe, en Île-de-France.
@@ -81,8 +86,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Smoak Paris</p>
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p>© {new Date().getFullYear()} Smoak Paris</p>
+            <Link href="/mentions-legales" className="hover:text-white/60">
+              Mentions légales
+            </Link>
+            <Link href="/cgv" className="hover:text-white/60">
+              CGV
+            </Link>
+            <Link href="/confidentialite" className="hover:text-white/60">
+              Confidentialité
+            </Link>
+          </div>
           <p className="max-w-md sm:text-right">
             Vente réservée aux personnes majeures. Un justificatif d&apos;âge
             pourra être demandé à la livraison.
