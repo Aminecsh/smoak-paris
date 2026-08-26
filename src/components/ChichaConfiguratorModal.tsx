@@ -113,34 +113,36 @@ export default function ChichaConfiguratorModal({
             <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               Choix du goût <span className="text-muted">— obligatoire</span>
             </h3>
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3 grid grid-cols-2 gap-3">
               {chichaFlavors.map((flavor) => (
                 <label
                   key={flavor.id}
-                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                  className={`group flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white transition-colors ${
                     flavorId === flavor.id
-                      ? "border-signal bg-secondary"
-                      : "border-border hover:bg-secondary/60"
+                      ? "border-signal ring-1 ring-signal"
+                      : "border-border hover:border-signal/40"
                   }`}
                 >
-                  <span className="flex items-center gap-3">
+                  <div className="relative aspect-square overflow-hidden bg-secondary">
                     <Image
                       src={flavor.image}
                       alt={flavor.name}
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                      width={300}
+                      height={300}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                    <span className="text-ink">{flavor.name}</span>
+                    <input
+                      type="radio"
+                      name="flavor"
+                      value={flavor.id}
+                      checked={flavorId === flavor.id}
+                      onChange={() => setFlavorId(flavor.id)}
+                      className="absolute right-2 top-2 h-5 w-5 accent-signal"
+                    />
+                  </div>
+                  <span className="p-3 text-center font-serif font-semibold text-ink">
+                    {flavor.name}
                   </span>
-                  <input
-                    type="radio"
-                    name="flavor"
-                    value={flavor.id}
-                    checked={flavorId === flavor.id}
-                    onChange={() => setFlavorId(flavor.id)}
-                    className="h-4 w-4 flex-shrink-0 accent-signal"
-                  />
                 </label>
               ))}
             </div>

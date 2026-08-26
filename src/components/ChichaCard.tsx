@@ -44,7 +44,7 @@ export default function ChichaCard({
         </p>
 
         <span className="mt-5 inline-flex w-fit items-center gap-2 rounded-lg bg-white px-4 py-2 text-xs font-semibold text-ink transition-colors group-hover:bg-white/90">
-          Composer ma chicha
+          {chicha.isPack ? "Composer mon pack" : "Composer ma chicha"}
           <span aria-hidden="true">→</span>
         </span>
       </div>

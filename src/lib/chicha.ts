@@ -8,19 +8,19 @@ import { products } from "./products";
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
-    name: "Quasar",
-    description: "1 chicha Quasar, goût, charbon, briquet, embout plastique.",
+    name: "Chicha Quasar",
+    description: "Une chicha complète, prête à fumer.",
     price: 30,
     emoji: "🌌",
-    image: "/produits/Hawaii.png",
+    image: "/produits/chicha-quasar.jpg",
   },
   {
-    id: "pack-zhama",
-    name: "Pack Zhama",
+    id: "pack-zahma",
+    name: "Pack Zahma",
     description: "Une chicha + une boisson + un bonbon au choix, en pack.",
     price: 33.9,
     emoji: "",
-    image: "/produits/Love66.png",
+    image: "/produits/pack-zahma.jpg",
     isPack: true,
   },
 ];
