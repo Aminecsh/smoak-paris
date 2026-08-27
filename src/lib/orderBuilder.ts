@@ -109,11 +109,10 @@ export function buildOrder(payload: {
       return { error: "Sucrerie en supplément inconnue" };
     }
 
-    const unitPrice =
-      base.price +
-      (chicha.recharge ? rechargeSupplement.price : 0) +
-      drinks.reduce((sum, d) => sum + (d?.price ?? 0), 0) +
-      sweets.reduce((sum, s) => sum + (s?.price ?? 0), 0);
+    // Les boissons/bonbons d'un pack sont inclus dans le prix affiché
+    // (chichaBases[].price) — ils ne s'ajoutent pas au tarif, contrairement
+    // à la tête en plus qui est un vrai supplément payant.
+    const unitPrice = base.price + (chicha.recharge ? rechargeSupplement.price : 0);
 
     itemRows.push({
       kind: "chicha",
