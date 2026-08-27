@@ -43,23 +43,6 @@ const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
 const POSTAL_CODE_PATTERN = /^\d{5}$/;
 
 export async function POST(request: NextRequest) {
-  try {
-    return await handlePost(request);
-  } catch (err) {
-    // DEBUG TEMPORAIRE — autorisé par l'utilisateur pour diagnostiquer un
-    // crash 500 en prod, à retirer immédiatement après lecture.
-    return NextResponse.json(
-      {
-        error: "DEBUG",
-        message: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : null,
-      },
-      { status: 500 },
-    );
-  }
-}
-
-async function handlePost(request: NextRequest): Promise<NextResponse> {
   const ip = getClientIp(request);
   if (!checkRateLimit(`create-order:${ip}`, 8, 10 * 60 * 1000)) {
     return NextResponse.json(
