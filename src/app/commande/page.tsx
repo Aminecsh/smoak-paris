@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { products } from "@/lib/products";
 import { chichaBases } from "@/lib/chicha";
 import ProductCard from "@/components/ProductCard";
@@ -17,6 +18,25 @@ function slugify(label: string) {
     .replace(/[^a-z0-9]+/g, "-");
 }
 
+function useOpenChichaFromQuery(onOpen: (id: string) => void) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const openId = searchParams.get("open");
+    if (openId && chichaBases.some((c) => c.id === openId)) {
+      onOpen(openId);
+      router.replace("/commande#chicha", { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+function OpenChichaFromQuery({ onOpen }: { onOpen: (id: string) => void }) {
+  useOpenChichaFromQuery(onOpen);
+  return null;
+}
+
 export default function CommandePage() {
   const categories = Array.from(new Set(products.map((p) => p.category)));
   const sections = [{ label: "Chicha", id: "chicha" }, ...categories.map((c) => ({ label: c, id: slugify(c) }))];
@@ -26,6 +46,9 @@ export default function CommandePage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">
+      <Suspense fallback={null}>
+        <OpenChichaFromQuery onOpen={setOpenChichaId} />
+      </Suspense>
       <div className="py-10">
         <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">
           Le menu
