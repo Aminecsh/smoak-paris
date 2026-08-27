@@ -33,3 +33,13 @@ body {
   font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/* En dessous de 16px, Safari iOS zoome automatiquement la page quand on
+   tape dans un champ — nos inputs/textarea/select passent en text-sm
+   (14px) par défaut, donc on force 16px ici plutôt que de corriger chaque
+   className un par un. */
+input,
+textarea,
+select {
+  font-size: 16px;
+}

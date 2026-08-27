@@ -12,7 +12,7 @@ const NAV_LINKS = [
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-ink">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-28 pt-14 sm:px-6 sm:pb-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Image
