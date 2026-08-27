@@ -14,7 +14,7 @@ export default function ChichaCard({
     <button
       type="button"
       onClick={() => onSelect(chicha.id)}
-      className="group relative flex aspect-[4/5] w-full flex-col overflow-hidden rounded-2xl text-left transition-transform hover:-translate-y-0.5 sm:aspect-square"
+      className="group relative flex aspect-square w-full flex-col overflow-hidden rounded-2xl text-left transition-transform hover:-translate-y-0.5"
     >
       {chicha.image && (
         <Image

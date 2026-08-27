@@ -17,11 +17,8 @@ export default function ConfidentialitePage() {
             </h2>
             <p className="mt-3">
               Le responsable du traitement des données collectées sur ce site
-              est{" "}
-              <strong className="text-ink">
-                [À COMPLÉTER — nom et forme juridique de l&apos;éditeur]
-              </strong>
-              , joignable à l&apos;adresse [À COMPLÉTER — email de contact].
+              est <strong className="text-ink">Smoak Paris</strong>, joignable
+              à l&apos;adresse smoak.paris@gmail.com.
             </p>
           </section>
 
@@ -102,7 +99,7 @@ export default function ConfidentialitePage() {
               droit d&apos;accès, de rectification, d&apos;effacement, de
               limitation, d&apos;opposition et de portabilité sur vos données
               personnelles. Vous pouvez exercer ces droits en nous contactant à
-              [À COMPLÉTER — email de contact dédié]. Vous disposez également du
+              smoak.paris@gmail.com. Vous disposez également du
               droit d&apos;introduire une réclamation auprès de la CNIL
               (www.cnil.fr).
             </p>

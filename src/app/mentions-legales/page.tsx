@@ -17,21 +17,16 @@ export default function MentionsLegalesPage() {
             <h2 className="font-serif text-lg font-semibold text-ink">1. Éditeur du site</h2>
             <p className="mt-3">
               Le site Smoak Paris est édité par{" "}
-              <strong className="text-ink">
-                [À COMPLÉTER — nom et forme juridique, ex : Prénom Nom,
-                micro-entrepreneur]
-              </strong>
-              .
+              <strong className="text-ink">Smoak Paris</strong>.
             </p>
             <ul className="mt-3 flex flex-col gap-1.5">
-              <li>Adresse du siège : [À COMPLÉTER]</li>
+              <li>Adresse du siège : 8 rue Tronchet, Paris</li>
               <li>SIRET : [À COMPLÉTER — en cours d&apos;immatriculation]</li>
-              <li>N° de TVA intracommunautaire : [À COMPLÉTER si applicable]</li>
               <li>Téléphone : {SERVICE_PHONE_DISPLAY}</li>
-              <li>Email : [À COMPLÉTER — adresse de contact professionnelle]</li>
+              <li>Email : smoak.paris@gmail.com</li>
             </ul>
             <p className="mt-3 text-xs text-muted">
-              Directeur de la publication : [À COMPLÉTER — nom du responsable].
+              Directeur de la publication : Julien Pouillot.
             </p>
           </section>
 

@@ -21,11 +21,9 @@ export default function CgvPage() {
             <p className="mt-3">
               Les présentes conditions générales de vente (CGV) régissent les
               commandes passées sur le site Smoak Paris, exploité par{" "}
-              <strong className="text-ink">
-                [À COMPLÉTER — nom et forme juridique de l&apos;éditeur]
-              </strong>
-              . Toute commande implique l&apos;acceptation sans réserve des
-              présentes CGV.
+              <strong className="text-ink">Smoak Paris</strong>. Toute
+              commande implique l&apos;acceptation sans réserve des présentes
+              CGV.
             </p>
           </section>
 
@@ -86,16 +84,15 @@ export default function CgvPage() {
               6. Restitution du matériel
             </h2>
             <p className="mt-3">
-              La chicha livrée doit être restituée au livreur au plus tard à
-              l&apos;heure limite indiquée sur la page de suivi de commande
-              (au plus tard {LAST_RETURN_LABEL} pour le dernier créneau de la
-              soirée), sauf reprise anticipée demandée par le client. En cas de
-              perte, de casse ou de dégradation du matériel,{" "}
-              <strong className="text-ink">
-                [À COMPLÉTER — préciser le montant ou le mode de calcul d&apos;une
-                éventuelle facturation de remplacement]
-              </strong>
-              .
+              Une caution de 10€ est demandée à la livraison. Elle est
+              intégralement rendue au client lors de la reprise du matériel
+              par le livreur. La chicha livrée doit être restituée au plus
+              tard à l&apos;heure limite indiquée sur la page de suivi de
+              commande (au plus tard {LAST_RETURN_LABEL} pour le dernier
+              créneau de la soirée), sauf reprise anticipée demandée par le
+              client. Si le matériel est rendu cassé ou endommagé, ou s&apos;il
+              n&apos;est pas restitué (matériel disparu), la caution est
+              conservée par Smoak Paris.
             </p>
           </section>
 
@@ -148,14 +145,12 @@ export default function CgvPage() {
               </a>
               ) ou par téléphone au {SERVICE_PHONE_DISPLAY}. Conformément à
               l&apos;article L616-1 du Code de la consommation, en cas de litige
-              non résolu, le client peut recourir gratuitement à un médiateur de
-              la consommation :{" "}
+              non résolu, le client peut recourir gratuitement au médiateur de
+              la consommation désigné : Lucie Nawen (
               <strong className="text-ink">
-                [À COMPLÉTER — nom et coordonnées du médiateur de la
-                consommation désigné, obligatoire pour toute vente aux
-                particuliers]
+                [À COMPLÉTER — coordonnées du médiateur]
               </strong>
-              .
+              ).
             </p>
           </section>
 
