@@ -1,10 +1,14 @@
 import { ChichaBase, ChichaFlavor, ChichaSupplement } from "./types";
 import { products } from "./products";
 
-// Les deux chichas SMOAK proposées à la composition, façon Uber Eats :
-// on choisit la base, puis on personnalise (goût, recharge, extras).
+// Les chichas SMOAK proposées à la composition, façon Uber Eats : on
+// choisit la base, puis on personnalise (goût, recharge, extras).
 //
-// ⚠️ Prix provisoires — à valider avant mise en vente.
+// Cohérence des tarifs (base = Chicha Quasar à 30€) :
+// - Pack Chicha Sucré = chicha + 1 boisson (~2€) + 1 bonbon (~2,90-3,90€)
+//   inclus, valeur à l'unité ~35-36€ → pack à 35€ (léger avantage).
+// - Pack Duo = 2 chichas complètes (2×30€ = 60€ à l'unité) → pack à 55€
+//   (avantage duo de 5€).
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
@@ -15,13 +19,22 @@ export const chichaBases: ChichaBase[] = [
     image: "/produits/chicha-quasar.jpg",
   },
   {
-    id: "pack-zahma",
-    name: "Pack Zahma",
+    id: "pack-chicha-sucre",
+    name: "Pack Chicha Sucré",
     description: "Une chicha + une boisson + un bonbon au choix, en pack.",
-    price: 33.9,
+    price: 35,
     emoji: "",
     image: "/produits/pack-zahma.jpg",
     isPack: true,
+  },
+  {
+    id: "pack-duo",
+    name: "Pack Duo",
+    description: "Deux chichas complètes, chacune avec son goût au choix.",
+    price: 55,
+    emoji: "",
+    image: "/produits/pack-duo.jpg",
+    isDuo: true,
   },
 ];
 
@@ -42,12 +55,6 @@ export const rechargeSupplement: ChichaSupplement & {
   description: "Charbon, briquet et goût inclus.",
   price: 15,
   image: "/produits/Recharge.png",
-};
-
-export const charcoalSupplement: ChichaSupplement = {
-  id: "charbon-supplement",
-  name: "Pack de charbon",
-  price: 5,
 };
 
 // Les boissons proposables en supplément dans le composeur : le même

@@ -9,8 +9,10 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import {
   DELIVERY_SLOTS,
   LAST_RETURN_LABEL,
+  SPONTANEOUS_DELIVERY_MINUTES,
   formatSlotLabel,
   getReturnTimeLabel,
+  isSlotOrderingOpen,
 } from "@/lib/deliverySlots";
 import {
   COUNTRY_OPTIONS,
@@ -45,6 +47,7 @@ export default function LivraisonPage() {
   );
   const [note, setNote] = useState("");
   const [deliverySlot, setDeliverySlot] = useState<string>(DELIVERY_SLOTS[0]);
+  const [isSpontaneous] = useState(() => !isSlotOrderingOpen());
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("especes");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +84,7 @@ export default function LivraisonPage() {
             addressPoint: { lat: addressSelection.lat, lng: addressSelection.lng },
             note,
             paymentMethod,
-            deliverySlot,
+            deliverySlot: isSpontaneous ? undefined : deliverySlot,
           },
           items: items.map((item) => ({
             productId: item.productId,
@@ -90,8 +93,8 @@ export default function LivraisonPage() {
           configuredChichas: configuredChichas.map((c) => ({
             chichaId: c.chichaId,
             flavorId: c.flavorId,
+            secondFlavorId: c.secondFlavorId,
             recharge: c.recharge,
-            extraCharcoal: c.extraCharcoal,
             drinkIds: c.drinks.map((d) => d.id),
             sweetIds: c.sweets.map((s) => s.id),
             quantity: c.quantity,
@@ -288,38 +291,54 @@ export default function LivraisonPage() {
           </div>
         )}
 
-        <div>
-          <label className="text-xs font-semibold text-muted">
-            Créneau de livraison
-          </label>
-          <div className="mt-1 grid grid-cols-4 gap-2">
-            {DELIVERY_SLOTS.map((slot) => (
-              <label
-                key={slot}
-                className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
-                  deliverySlot === slot
-                    ? "border-signal bg-secondary text-ink"
-                    : "border-border text-muted"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="deliverySlot"
-                  value={slot}
-                  checked={deliverySlot === slot}
-                  onChange={() => setDeliverySlot(slot)}
-                  className="sr-only"
-                />
-                {formatSlotLabel(slot)}
-              </label>
-            ))}
+        {isSpontaneous ? (
+          <div className="rounded-lg border border-border bg-secondary p-4">
+            <p className="text-sm font-semibold text-ink">
+              Livraison spontanée — environ {SPONTANEOUS_DELIVERY_MINUTES} min
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              Les créneaux réservés à l&apos;avance ferment à 21h. Ta commande
+              part tout de suite en préparation, livrée en ~
+              {SPONTANEOUS_DELIVERY_MINUTES} minutes. La chicha devra être
+              restituée 2h après la livraison.
+            </p>
           </div>
-          <p className="mt-2 text-xs text-muted">
-            La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
-            {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
-            {LAST_RETURN_LABEL}).
-          </p>
-        </div>
+        ) : (
+          <div>
+            <label className="text-xs font-semibold text-muted">
+              Créneau de livraison
+            </label>
+            <div className="mt-1 grid grid-cols-4 gap-2">
+              {DELIVERY_SLOTS.map((slot) => (
+                <label
+                  key={slot}
+                  className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
+                    deliverySlot === slot
+                      ? "border-signal bg-secondary text-ink"
+                      : "border-border text-muted"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="deliverySlot"
+                    value={slot}
+                    checked={deliverySlot === slot}
+                    onChange={() => setDeliverySlot(slot)}
+                    className="sr-only"
+                  />
+                  {formatSlotLabel(slot)}
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
+              {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
+              {LAST_RETURN_LABEL}). Après 21h, les créneaux ferment et les
+              commandes deviennent spontanées (livrées en ~
+              {SPONTANEOUS_DELIVERY_MINUTES} min).
+            </p>
+          </div>
+        )}
 
         <div>
           <label className="text-xs font-semibold text-muted">

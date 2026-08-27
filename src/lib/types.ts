@@ -18,6 +18,9 @@ export interface ChichaBase {
   // Pack "compose ta soirée" : une boisson et une sucrerie au choix sont
   // incluses dans le prix, sans supplément (voir ChichaConfiguratorModal).
   isPack?: boolean;
+  // Pack Duo : deux chichas complètes, chacune avec son propre goût au
+  // choix (voir ChichaConfiguratorModal).
+  isDuo?: boolean;
 }
 
 export interface ChichaFlavor {
@@ -49,8 +52,10 @@ export interface ConfiguredChichaItem {
   chichaEmoji: string;
   flavorId: string;
   flavorName: string;
+  // Pack Duo uniquement : goût de la seconde chicha.
+  secondFlavorId?: string;
+  secondFlavorName?: string;
   recharge: boolean;
-  extraCharcoal: boolean;
   drinks: ChichaSupplementLine[];
   sweets: ChichaSupplementLine[];
   unitPrice: number;

@@ -25,7 +25,7 @@ const HORAIRES = [
 const FAQ = [
   {
     q: "Combien de temps avant la livraison ?",
-    a: "En moyenne 38 minutes une fois la commande validée, selon votre secteur.",
+    a: "Avant 21h, vous réservez un créneau pour la soirée. À partir de 21h, les créneaux ferment et chaque commande est spontanée : livrée en ~45 minutes.",
   },
   {
     q: "Qui vient livrer et reprendre la chicha ?",

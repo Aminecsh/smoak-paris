@@ -55,7 +55,7 @@ export default function Footer() {
                 {formatSlotLabel(DELIVERY_SLOTS[0])} —{" "}
                 {formatSlotLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1])}, 7j/7
               </li>
-              <li>38 min en moyenne</li>
+              <li>Créneaux jusqu&apos;à 21h, spontané ensuite (~45 min)</li>
             </ul>
           </div>
 

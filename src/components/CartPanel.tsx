@@ -101,10 +101,10 @@ export default function CartPanel() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-ink">
                     {chicha.chichaName} — {chicha.flavorName}
+                    {chicha.secondFlavorName ? ` + ${chicha.secondFlavorName}` : ""}
                   </p>
                   <ul className="mt-0.5 text-xs text-muted">
                     {chicha.recharge && <li>+ Tête en plus</li>}
-                    {chicha.extraCharcoal && <li>+ Pack de charbon</li>}
                     {groupSupplementLines(chicha.drinks).map((drink) => (
                       <li key={drink.id}>
                         + {drink.quantity > 1 ? `${drink.quantity}× ` : ""}

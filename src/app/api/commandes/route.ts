@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { geocodeAddress } from "@/lib/geocode";
-import { isDeliverySlot } from "@/lib/deliverySlots";
+import {
+  getSpontaneousDeliverySlot,
+  isDeliverySlot,
+  isSlotOrderingOpen,
+} from "@/lib/deliverySlots";
 import { getDeliveryZone, isInIleDeFrance } from "@/lib/deliveryZones";
 import {
   buildOrder,
@@ -78,8 +82,18 @@ export async function POST(request: NextRequest) {
   if (paymentMethod && !VALID_PAYMENT_METHODS.includes(paymentMethod)) {
     return NextResponse.json({ error: "Moyen de paiement invalide" }, { status: 400 });
   }
-  if (!isDeliverySlot(deliverySlot)) {
-    return NextResponse.json({ error: "Créneau de livraison invalide" }, { status: 400 });
+  // L'heure serveur fait foi (pas celle du client) : avant 21h on exige un
+  // créneau valide parmi la liste ; à partir de 21h, la commande est
+  // spontanée et l'heure de livraison est calculée ici, quoi qu'ait envoyé
+  // le client.
+  let resolvedDeliverySlot: string;
+  if (isSlotOrderingOpen()) {
+    if (!isDeliverySlot(deliverySlot)) {
+      return NextResponse.json({ error: "Créneau de livraison invalide" }, { status: 400 });
+    }
+    resolvedDeliverySlot = deliverySlot;
+  } else {
+    resolvedDeliverySlot = getSpontaneousDeliverySlot();
   }
 
   const built = buildOrder(payload);
@@ -114,7 +128,7 @@ export async function POST(request: NextRequest) {
     p_delivery_lng: geo?.lng ?? null,
     p_customer_email: email.trim(),
     p_payment_method: paymentMethod ?? "especes",
-    p_delivery_slot: deliverySlot,
+    p_delivery_slot: resolvedDeliverySlot,
     p_postal_code: postalCode.trim(),
     p_city: city.trim(),
     p_delivery_zone: deliveryZone,

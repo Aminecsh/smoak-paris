@@ -28,7 +28,7 @@ interface OrderRow {
   status: string;
   payment_method: string;
   delivery_slot: string | null;
-  notification_channel: "whatsapp" | "email" | "failed" | null;
+  notification_channel: "email" | "failed" | null;
 }
 
 const PAYMENT_LABELS: Record<string, string> = {

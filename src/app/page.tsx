@@ -6,7 +6,7 @@ import { chichaBases } from "@/lib/chicha";
 import OrderTab from "@/components/OrderTab";
 
 const STATS: { value: string; label: string; withStar?: boolean; live?: boolean }[] = [
-  { value: "38 min", label: "Délai moyen" },
+  { value: "45 min", label: "Livraison spontanée" },
   { value: "50 chichas", label: "Dans notre flotte" },
   { value: "4.8/5", label: "Avis Trustpilot", withStar: true },
   { value: "180+", label: "Commandes livrées", live: true },
@@ -16,7 +16,7 @@ const REVIEWS = [
   { name: "Mehdi", place: "Paris 11e", quote: "Livré en 25 minutes un vendredi soir, franchement au top." },
   { name: "Sarah", place: "Vincennes", quote: "Simple, rapide, et la chicha nickel montée dès l'arrivée." },
   { name: "Yanis", place: "Paris 18e", quote: "Service pro, aucun jugement, le mec est resté hyper discret." },
-  { name: "Camille", place: "Montreuil", quote: "Ils repassent récupérer le matériel le lendemain sans embêter personne." },
+  { name: "Camille", place: "Montreuil", quote: "Ils récupèrent le matériel le soir même, ils ont été arrangeants pour le reprendre plus tôt car on partait en boîte. Top service." },
 ];
 
 const HIGHLIGHT_IDS = [

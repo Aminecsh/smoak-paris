@@ -3,7 +3,6 @@ import {
   chichaBases,
   chichaFlavors,
   rechargeSupplement,
-  charcoalSupplement,
   drinkSupplements,
   sweetSupplements,
 } from "@/lib/chicha";
@@ -16,8 +15,8 @@ export interface OrderItemInput {
 export interface ConfiguredChichaInput {
   chichaId: string;
   flavorId: string;
+  secondFlavorId?: string;
   recharge?: boolean;
-  extraCharcoal?: boolean;
   drinkIds?: string[];
   sweetIds?: string[];
   quantity: number;
@@ -91,6 +90,12 @@ export function buildOrder(payload: {
     if (!flavor) {
       return { error: `Goût inconnu : ${chicha.flavorId}` };
     }
+    const secondFlavor = chicha.secondFlavorId
+      ? chichaFlavors.find((f) => f.id === chicha.secondFlavorId)
+      : null;
+    if (chicha.secondFlavorId && !secondFlavor) {
+      return { error: `Goût inconnu : ${chicha.secondFlavorId}` };
+    }
     const drinks = (chicha.drinkIds ?? []).map((id) =>
       drinkSupplements.find((d) => d.id === id),
     );
@@ -107,19 +112,20 @@ export function buildOrder(payload: {
     const unitPrice =
       base.price +
       (chicha.recharge ? rechargeSupplement.price : 0) +
-      (chicha.extraCharcoal ? charcoalSupplement.price : 0) +
       drinks.reduce((sum, d) => sum + (d?.price ?? 0), 0) +
       sweets.reduce((sum, s) => sum + (s?.price ?? 0), 0);
 
     itemRows.push({
       kind: "chicha",
-      name: `${base.name} — ${flavor.name}`,
+      name: secondFlavor
+        ? `${base.name} — ${flavor.name} + ${secondFlavor.name}`
+        : `${base.name} — ${flavor.name}`,
       unit_price: unitPrice,
       quantity: chicha.quantity,
       details: {
         flavor: flavor.name,
+        secondFlavor: secondFlavor?.name ?? null,
         recharge: Boolean(chicha.recharge),
-        extraCharcoal: Boolean(chicha.extraCharcoal),
         drinks: drinks.map((d) => d!.name),
         sweets: sweets.map((s) => s!.name),
       },
@@ -127,17 +133,17 @@ export function buildOrder(payload: {
 
     stockDecrements.push({ id: base.id, name: base.name, quantity: chicha.quantity });
     stockDecrements.push({ id: flavor.id, name: flavor.name, quantity: chicha.quantity });
+    if (secondFlavor) {
+      stockDecrements.push({
+        id: secondFlavor.id,
+        name: secondFlavor.name,
+        quantity: chicha.quantity,
+      });
+    }
     if (chicha.recharge) {
       stockDecrements.push({
         id: rechargeSupplement.id,
         name: rechargeSupplement.name,
-        quantity: chicha.quantity,
-      });
-    }
-    if (chicha.extraCharcoal) {
-      stockDecrements.push({
-        id: charcoalSupplement.id,
-        name: charcoalSupplement.name,
         quantity: chicha.quantity,
       });
     }

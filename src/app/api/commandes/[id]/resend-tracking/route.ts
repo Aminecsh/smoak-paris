@@ -2,17 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
 
-const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Permet au client de corriger son numéro (s'il n'a pas reçu le lien
-// WhatsApp car ce n'était pas le bon) et de renvoyer le lien de suivi.
+// Permet au client de corriger son email (si le lien de suivi n'a pas pu
+// être envoyé) et de le renvoyer.
 export async function POST(
   request: NextRequest,
   ctx: RouteContext<"/api/commandes/[id]/resend-tracking">,
 ) {
   const { id } = await ctx.params;
 
-  let body: { phone?: string };
+  let body: { email?: string };
   try {
     body = await request.json();
   } catch {
@@ -30,15 +30,15 @@ export async function POST(
     return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
   }
 
-  let phone = order.customer_phone;
-  if (body.phone) {
-    if (!PHONE_PATTERN.test(body.phone.trim())) {
-      return NextResponse.json({ error: "Numéro de téléphone invalide" }, { status: 400 });
+  let email = order.customer_email;
+  if (body.email) {
+    if (!EMAIL_PATTERN.test(body.email.trim())) {
+      return NextResponse.json({ error: "Adresse email invalide" }, { status: 400 });
     }
-    phone = body.phone.trim();
+    email = body.email.trim();
     const { error: updateError } = await supabase
       .from("orders")
-      .update({ customer_phone: phone })
+      .update({ customer_email: email })
       .eq("id", id);
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
@@ -48,8 +48,8 @@ export async function POST(
   const trackingUrl = `${request.nextUrl.origin}/commande/suivi/${id}`;
   const notification = await sendTrackingLink({
     firstName: order.customer_name.trim().split(" ")[0],
-    phone,
-    email: order.customer_email,
+    phone: order.customer_phone,
+    email,
     trackingUrl,
   });
 

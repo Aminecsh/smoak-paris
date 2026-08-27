@@ -1,36 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import {
-  COUNTRY_OPTIONS,
-  DEFAULT_COUNTRY,
-  formatNationalNumber,
-  formatPhoneForStorage,
-  isValidNationalNumber,
-} from "@/lib/phone";
 
 export default function ResendTrackingLink({
   orderId,
   initialChannel,
 }: {
   orderId: string;
-  initialChannel: "whatsapp" | "email" | "failed" | null;
+  initialChannel: "email" | "failed" | null;
 }) {
   const [channel, setChannel] = useState(initialChannel);
   const [editing, setEditing] = useState(false);
-  const [dialCode, setDialCode] = useState(DEFAULT_COUNTRY.dialCode);
-  const [phoneDigits, setPhoneDigits] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resend = async (phone?: string) => {
+  const resend = async (newEmail?: string) => {
     setError(null);
     setSubmitting(true);
     try {
       const res = await fetch(`/api/commandes/${orderId}/resend-tracking`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(phone ? { phone } : {}),
+        body: JSON.stringify(newEmail ? { email: newEmail } : {}),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -46,28 +38,24 @@ export default function ResendTrackingLink({
   };
 
   const handleCorrect = () => {
-    if (!isValidNationalNumber(dialCode, phoneDigits)) {
-      setError("Numéro de téléphone invalide pour le pays sélectionné");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Adresse email invalide");
       return;
     }
-    resend(formatPhoneForStorage(dialCode, phoneDigits));
+    resend(email);
   };
 
-  if (channel === "whatsapp") {
+  if (channel === "email") {
     return (
       <p className="mt-2 text-xs text-muted">
-        Lien de suivi envoyé sur WhatsApp ✅
+        Lien de suivi envoyé par email ✅
       </p>
     );
   }
 
   return (
     <div className="mt-2 rounded-lg border border-border bg-white p-3 text-xs text-muted">
-      {channel === "email" ? (
-        <p>Pas de WhatsApp trouvé — le lien de suivi vous a été envoyé par email.</p>
-      ) : (
-        <p>Le lien de suivi n&apos;a pas pu être envoyé.</p>
-      )}
+      <p>Le lien de suivi n&apos;a pas pu être envoyé par email.</p>
 
       {!editing ? (
         <button
@@ -75,31 +63,17 @@ export default function ResendTrackingLink({
           onClick={() => setEditing(true)}
           className="mt-2 font-semibold text-ink underline"
         >
-          Mauvais numéro ? Corrige-le
+          Mauvaise adresse ? Corrige-la
         </button>
       ) : (
         <div className="mt-2 flex flex-col gap-2">
-          <div className="flex gap-2">
-            <select
-              value={dialCode}
-              onChange={(e) => setDialCode(e.target.value)}
-              className="rounded-lg border border-border bg-white px-2 py-2 text-sm text-ink"
-            >
-              {COUNTRY_OPTIONS.map((c) => (
-                <option key={c.code} value={c.dialCode}>
-                  {c.flag} +{c.dialCode}
-                </option>
-              ))}
-            </select>
-            <input
-              type="tel"
-              inputMode="numeric"
-              value={formatNationalNumber(phoneDigits)}
-              onChange={(e) => setPhoneDigits(e.target.value.replace(/\D/g, ""))}
-              placeholder="6 12 34 56 78"
-              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-ink"
-            />
-          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="vous@exemple.com"
+            className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-ink"
+          />
           <button
             type="button"
             onClick={handleCorrect}
