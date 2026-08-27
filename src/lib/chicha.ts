@@ -9,6 +9,8 @@ import { products } from "./products";
 //   inclus, valeur à l'unité ~35-36€ → pack à 35€ (léger avantage).
 // - Pack Duo = 2 chichas complètes (2×30€ = 60€ à l'unité) → pack à 55€
 //   (avantage duo de 5€).
+// - Pack Soirée = 3 chichas + 3 boissons + 3 bonbons inclus (valeur à
+//   l'unité ~90€ de chichas + ~15€ de boissons/bonbons) → pack à 95€.
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
@@ -35,6 +37,15 @@ export const chichaBases: ChichaBase[] = [
     emoji: "",
     image: "/produits/pack-duo.jpg",
     isDuo: true,
+  },
+  {
+    id: "pack-soiree",
+    name: "Pack Soirée",
+    description: "Trois chichas complètes, chacune avec son goût, sa boisson et son bonbon au choix.",
+    price: 95,
+    emoji: "",
+    image: "/produits/pack-soiree.jpg",
+    isSoiree: true,
   },
 ];
 

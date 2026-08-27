@@ -21,6 +21,9 @@ export interface ChichaBase {
   // Pack Duo : deux chichas complètes, chacune avec son propre goût au
   // choix (voir ChichaConfiguratorModal).
   isDuo?: boolean;
+  // Pack Soirée : trois chichas complètes, chacune avec son propre goût,
+  // sa boisson et son bonbon au choix (voir ChichaConfiguratorModal).
+  isSoiree?: boolean;
 }
 
 export interface ChichaFlavor {
@@ -55,6 +58,9 @@ export interface ConfiguredChichaItem {
   // Pack Duo uniquement : goût de la seconde chicha.
   secondFlavorId?: string;
   secondFlavorName?: string;
+  // Pack Soirée uniquement : goût de la troisième chicha.
+  thirdFlavorId?: string;
+  thirdFlavorName?: string;
   recharge: boolean;
   drinks: ChichaSupplementLine[];
   sweets: ChichaSupplementLine[];

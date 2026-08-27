@@ -16,6 +16,7 @@ export interface ConfiguredChichaInput {
   chichaId: string;
   flavorId: string;
   secondFlavorId?: string;
+  thirdFlavorId?: string;
   recharge?: boolean;
   drinkIds?: string[];
   sweetIds?: string[];
@@ -96,6 +97,12 @@ export function buildOrder(payload: {
     if (chicha.secondFlavorId && !secondFlavor) {
       return { error: `Goût inconnu : ${chicha.secondFlavorId}` };
     }
+    const thirdFlavor = chicha.thirdFlavorId
+      ? chichaFlavors.find((f) => f.id === chicha.thirdFlavorId)
+      : null;
+    if (chicha.thirdFlavorId && !thirdFlavor) {
+      return { error: `Goût inconnu : ${chicha.thirdFlavorId}` };
+    }
     const drinks = (chicha.drinkIds ?? []).map((id) =>
       drinkSupplements.find((d) => d.id === id),
     );
@@ -114,16 +121,19 @@ export function buildOrder(payload: {
     // à la tête en plus qui est un vrai supplément payant.
     const unitPrice = base.price + (chicha.recharge ? rechargeSupplement.price : 0);
 
+    const flavorNames = [flavor.name, secondFlavor?.name, thirdFlavor?.name]
+      .filter(Boolean)
+      .join(" + ");
+
     itemRows.push({
       kind: "chicha",
-      name: secondFlavor
-        ? `${base.name} — ${flavor.name} + ${secondFlavor.name}`
-        : `${base.name} — ${flavor.name}`,
+      name: `${base.name} — ${flavorNames}`,
       unit_price: unitPrice,
       quantity: chicha.quantity,
       details: {
         flavor: flavor.name,
         secondFlavor: secondFlavor?.name ?? null,
+        thirdFlavor: thirdFlavor?.name ?? null,
         recharge: Boolean(chicha.recharge),
         drinks: drinks.map((d) => d!.name),
         sweets: sweets.map((s) => s!.name),
@@ -136,6 +146,13 @@ export function buildOrder(payload: {
       stockDecrements.push({
         id: secondFlavor.id,
         name: secondFlavor.name,
+        quantity: chicha.quantity,
+      });
+    }
+    if (thirdFlavor) {
+      stockDecrements.push({
+        id: thirdFlavor.id,
+        name: thirdFlavor.name,
         quantity: chicha.quantity,
       });
     }

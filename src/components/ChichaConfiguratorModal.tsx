@@ -8,7 +8,7 @@ import {
   drinkSupplements,
   sweetSupplements,
 } from "@/lib/chicha";
-import { ChichaBase, ChichaFlavor } from "@/lib/types";
+import { ChichaBase, ChichaFlavor, ChichaSupplement } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 
 function FlavorGrid({
@@ -57,6 +57,60 @@ function FlavorGrid({
   );
 }
 
+function SupplementList({
+  items,
+  selectedId,
+  onSelect,
+  name,
+}: {
+  items: ChichaSupplement[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  name: string;
+}) {
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      {items.map((item) => (
+        <label
+          key={item.id}
+          className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+            selectedId === item.id
+              ? "border-signal bg-secondary"
+              : "border-border hover:bg-secondary/60"
+          }`}
+        >
+          <span className="flex min-w-0 items-center gap-3">
+            {item.image && (
+              <Image
+                src={item.image}
+                alt={item.name}
+                width={40}
+                height={40}
+                className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+              />
+            )}
+            <span className="truncate text-ink">{item.name}</span>
+          </span>
+          <input
+            type="radio"
+            name={name}
+            value={item.id}
+            checked={selectedId === item.id}
+            onChange={() => onSelect(item.id)}
+            className="h-4 w-4 flex-shrink-0 accent-signal"
+          />
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function updateAt<T>(arr: T[], index: number, value: T): T[] {
+  const next = [...arr];
+  next[index] = value;
+  return next;
+}
+
 export default function ChichaConfiguratorModal({
   chicha,
   onClose,
@@ -67,8 +121,15 @@ export default function ChichaConfiguratorModal({
   const { addConfiguredChicha } = useCart();
   const isPack = Boolean(chicha.isPack);
   const isDuo = Boolean(chicha.isDuo);
-  const totalSteps = isPack ? 3 : isDuo ? 2 : 1;
-  const stepLabels = isPack ? ["Goût", "Boisson", "Bonbon"] : isDuo ? ["Goût 1", "Goût 2"] : [];
+  const isSoiree = Boolean(chicha.isSoiree);
+  const totalSteps = isPack ? 3 : isDuo ? 2 : isSoiree ? 3 : 1;
+  const stepLabels = isPack
+    ? ["Goût", "Boisson", "Bonbon"]
+    : isDuo
+      ? ["Goût 1", "Goût 2"]
+      : isSoiree
+        ? ["Chicha 1", "Chicha 2", "Chicha 3"]
+        : [];
 
   const [step, setStep] = useState(1);
   const [flavorId, setFlavorId] = useState(chichaFlavors[0].id);
@@ -76,6 +137,13 @@ export default function ChichaConfiguratorModal({
   const [recharge, setRecharge] = useState(false);
   const [packDrinkId, setPackDrinkId] = useState<string | null>(null);
   const [packSweetId, setPackSweetId] = useState<string | null>(null);
+  const [soireeFlavorIds, setSoireeFlavorIds] = useState<string[]>([
+    chichaFlavors[0].id,
+    chichaFlavors[0].id,
+    chichaFlavors[0].id,
+  ]);
+  const [soireeDrinkIds, setSoireeDrinkIds] = useState<(string | null)[]>([null, null, null]);
+  const [soireeSweetIds, setSoireeSweetIds] = useState<(string | null)[]>([null, null, null]);
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -102,32 +170,67 @@ export default function ChichaConfiguratorModal({
   const unitPrice = chicha.price + (recharge ? rechargeSupplement.price : 0);
 
   const handleAdd = () => {
-    const flavor = chichaFlavors.find((f) => f.id === flavorId)!;
-    const secondFlavor = isDuo
-      ? chichaFlavors.find((f) => f.id === secondFlavorId)!
-      : null;
+    if (isSoiree) {
+      const flavors = soireeFlavorIds.map((id) => chichaFlavors.find((f) => f.id === id)!);
+      const drinks = soireeDrinkIds.map((id) => {
+        const drink = drinkSupplements.find((d) => d.id === id)!;
+        return { id: drink.id, name: drink.name, price: 0 };
+      });
+      const sweets = soireeSweetIds.map((id) => {
+        const sweet = sweetSupplements.find((s) => s.id === id)!;
+        return { id: sweet.id, name: sweet.name, price: 0 };
+      });
 
-    addConfiguredChicha({
-      chichaId: chicha.id,
-      chichaName: chicha.name,
-      chichaEmoji: chicha.emoji,
-      flavorId: flavor.id,
-      flavorName: flavor.name,
-      secondFlavorId: secondFlavor?.id,
-      secondFlavorName: secondFlavor?.name,
-      recharge,
-      drinks: selectedDrinks,
-      sweets: selectedSweets,
-      unitPrice,
-      quantity,
-    });
+      addConfiguredChicha({
+        chichaId: chicha.id,
+        chichaName: chicha.name,
+        chichaEmoji: chicha.emoji,
+        flavorId: flavors[0].id,
+        flavorName: flavors[0].name,
+        secondFlavorId: flavors[1].id,
+        secondFlavorName: flavors[1].name,
+        thirdFlavorId: flavors[2].id,
+        thirdFlavorName: flavors[2].name,
+        recharge: false,
+        drinks,
+        sweets,
+        unitPrice: chicha.price,
+        quantity,
+      });
+    } else {
+      const flavor = chichaFlavors.find((f) => f.id === flavorId)!;
+      const secondFlavor = isDuo
+        ? chichaFlavors.find((f) => f.id === secondFlavorId)!
+        : null;
+
+      addConfiguredChicha({
+        chichaId: chicha.id,
+        chichaName: chicha.name,
+        chichaEmoji: chicha.emoji,
+        flavorId: flavor.id,
+        flavorName: flavor.name,
+        secondFlavorId: secondFlavor?.id,
+        secondFlavorName: secondFlavor?.name,
+        recharge,
+        drinks: selectedDrinks,
+        sweets: selectedSweets,
+        unitPrice,
+        quantity,
+      });
+    }
 
     setJustAdded(true);
     setTimeout(onClose, 500);
   };
 
   const canGoNext =
-    isPack && step === 2 ? Boolean(packDrinkId) : isPack && step === 3 ? Boolean(packSweetId) : true;
+    isPack && step === 2
+      ? Boolean(packDrinkId)
+      : isPack && step === 3
+        ? Boolean(packSweetId)
+        : isSoiree
+          ? Boolean(soireeDrinkIds[step - 1]) && Boolean(soireeSweetIds[step - 1])
+          : true;
 
   return (
     <div
@@ -216,7 +319,7 @@ export default function ChichaConfiguratorModal({
             </section>
           )}
 
-          {!isDuo && (!isPack || step === 1) && (
+          {!isDuo && !isSoiree && (!isPack || step === 1) && (
             <>
               {/* Goût */}
               <section>
@@ -270,39 +373,12 @@ export default function ChichaConfiguratorModal({
               <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
                 Boisson <span className="text-muted">— incluse, au choix</span>
               </h3>
-              <div className="mt-3 flex flex-col gap-2">
-                {drinkSupplements.map((drink) => (
-                  <label
-                    key={drink.id}
-                    className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-                      packDrinkId === drink.id
-                        ? "border-signal bg-secondary"
-                        : "border-border hover:bg-secondary/60"
-                    }`}
-                  >
-                    <span className="flex min-w-0 items-center gap-3">
-                      {drink.image && (
-                        <Image
-                          src={drink.image}
-                          alt={drink.name}
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-                        />
-                      )}
-                      <span className="truncate text-ink">{drink.name}</span>
-                    </span>
-                    <input
-                      type="radio"
-                      name="pack-drink"
-                      value={drink.id}
-                      checked={packDrinkId === drink.id}
-                      onChange={() => setPackDrinkId(drink.id)}
-                      className="h-4 w-4 flex-shrink-0 accent-signal"
-                    />
-                  </label>
-                ))}
-              </div>
+              <SupplementList
+                items={drinkSupplements}
+                selectedId={packDrinkId}
+                onSelect={setPackDrinkId}
+                name="pack-drink"
+              />
             </section>
           )}
 
@@ -311,40 +387,52 @@ export default function ChichaConfiguratorModal({
               <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
                 Sucreries <span className="text-muted">— incluse, au choix</span>
               </h3>
-              <div className="mt-3 flex flex-col gap-2">
-                {sweetSupplements.map((sweet) => (
-                  <label
-                    key={sweet.id}
-                    className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-                      packSweetId === sweet.id
-                        ? "border-signal bg-secondary"
-                        : "border-border hover:bg-secondary/60"
-                    }`}
-                  >
-                    <span className="flex min-w-0 items-center gap-3">
-                      {sweet.image && (
-                        <Image
-                          src={sweet.image}
-                          alt={sweet.name}
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-                        />
-                      )}
-                      <span className="truncate text-ink">{sweet.name}</span>
-                    </span>
-                    <input
-                      type="radio"
-                      name="pack-sweet"
-                      value={sweet.id}
-                      checked={packSweetId === sweet.id}
-                      onChange={() => setPackSweetId(sweet.id)}
-                      className="h-4 w-4 flex-shrink-0 accent-signal"
-                    />
-                  </label>
-                ))}
-              </div>
+              <SupplementList
+                items={sweetSupplements}
+                selectedId={packSweetId}
+                onSelect={setPackSweetId}
+                name="pack-sweet"
+              />
             </section>
+          )}
+
+          {isSoiree && step >= 1 && step <= 3 && (
+            <>
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+                  Chicha {step} — Goût
+                </h3>
+                <FlavorGrid
+                  selectedId={soireeFlavorIds[step - 1]}
+                  onSelect={(id) => setSoireeFlavorIds((ids) => updateAt(ids, step - 1, id))}
+                  name={`soiree-flavor-${step}`}
+                />
+              </section>
+
+              <section className="mt-6">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+                  Chicha {step} — Boisson <span className="text-muted">— incluse, au choix</span>
+                </h3>
+                <SupplementList
+                  items={drinkSupplements}
+                  selectedId={soireeDrinkIds[step - 1]}
+                  onSelect={(id) => setSoireeDrinkIds((ids) => updateAt(ids, step - 1, id))}
+                  name={`soiree-drink-${step}`}
+                />
+              </section>
+
+              <section className="mt-6">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+                  Chicha {step} — Bonbon <span className="text-muted">— inclus, au choix</span>
+                </h3>
+                <SupplementList
+                  items={sweetSupplements}
+                  selectedId={soireeSweetIds[step - 1]}
+                  onSelect={(id) => setSoireeSweetIds((ids) => updateAt(ids, step - 1, id))}
+                  name={`soiree-sweet-${step}`}
+                />
+              </section>
+            </>
           )}
         </div>
 

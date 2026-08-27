@@ -95,6 +95,7 @@ export default function LivraisonPage() {
             chichaId: c.chichaId,
             flavorId: c.flavorId,
             secondFlavorId: c.secondFlavorId,
+            thirdFlavorId: c.thirdFlavorId,
             recharge: c.recharge,
             drinkIds: c.drinks.map((d) => d.id),
             sweetIds: c.sweets.map((s) => s.id),
@@ -152,6 +153,7 @@ export default function LivraisonPage() {
                 <span className="block">
                   {c.quantity} × {c.chichaName} — {c.flavorName}
                   {c.secondFlavorName ? ` + ${c.secondFlavorName}` : ""}
+                  {c.thirdFlavorName ? ` + ${c.thirdFlavorName}` : ""}
                 </span>
                 {(c.recharge || c.drinks.length > 0 || c.sweets.length > 0) && (
                   <span className="mt-0.5 block text-xs text-muted">

@@ -90,6 +90,7 @@ export default function CartPanel() {
                   <p className="truncate text-sm font-medium text-ink">
                     {chicha.chichaName} — {chicha.flavorName}
                     {chicha.secondFlavorName ? ` + ${chicha.secondFlavorName}` : ""}
+                    {chicha.thirdFlavorName ? ` + ${chicha.thirdFlavorName}` : ""}
                   </p>
                   <ul className="mt-0.5 text-xs text-muted">
                     {chicha.recharge && <li>+ Tête en plus</li>}
