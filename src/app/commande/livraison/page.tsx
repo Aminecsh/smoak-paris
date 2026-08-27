@@ -59,6 +59,14 @@ export default function LivraisonPage() {
     e.preventDefault();
     setError(null);
 
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("Merci de renseigner votre prénom et votre nom");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Adresse email invalide");
+      return;
+    }
     if (!isValidNationalNumber(dialCode, phoneDigits)) {
       setError("Numéro de téléphone invalide pour le pays sélectionné");
       return;
@@ -199,7 +207,7 @@ export default function LivraisonPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-semibold text-muted">
