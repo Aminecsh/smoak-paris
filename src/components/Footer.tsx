@@ -55,7 +55,7 @@ export default function Footer() {
                 {formatSlotLabel(DELIVERY_SLOTS[0])} —{" "}
                 {formatSlotLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1])}, 7j/7
               </li>
-              <li>45 min en moyenne</li>
+              <li>38 min en moyenne</li>
             </ul>
           </div>
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const PROCESS = [
-  { n: "01", title: "Vous choisissez", desc: "Tête, tabac et intensité, sur le configurateur." },
+  { n: "01", title: "Vous choisissez", desc: "Tête, goût et intensité, sur le configurateur." },
   { n: "02", title: "On prépare", desc: "Un de nous monte votre chicha avant de partir la livrer." },
   { n: "03", title: "On l'apporte", desc: "On vient en personne, où que vous soyez en Île-de-France." },
   { n: "04", title: "On repasse", desc: "On revient récupérer le matériel en fin de session." },
