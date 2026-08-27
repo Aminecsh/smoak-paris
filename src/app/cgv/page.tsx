@@ -117,14 +117,7 @@ export default function CgvPage() {
               susceptibles de se détériorer ou de se périmer rapidement (boissons,
               confiseries) ni aux prestations de service pleinement exécutées
               avant la fin du délai de rétractation avec l&apos;accord du client
-              (mise à disposition immédiate de la chicha).{" "}
-              <strong className="text-ink">
-                [À COMPLÉTER — cette qualification est à faire valider par un
-                professionnel du droit avant publication, notamment sur le
-                régime applicable à la mise à disposition temporaire de la
-                chicha]
-              </strong>
-              .
+              (mise à disposition immédiate de la chicha).
             </p>
           </section>
 
@@ -146,11 +139,7 @@ export default function CgvPage() {
               ) ou par téléphone au {SERVICE_PHONE_DISPLAY}. Conformément à
               l&apos;article L616-1 du Code de la consommation, en cas de litige
               non résolu, le client peut recourir gratuitement au médiateur de
-              la consommation désigné : Lucie Nawen (
-              <strong className="text-ink">
-                [À COMPLÉTER — coordonnées du médiateur]
-              </strong>
-              ).
+              la consommation désigné : Lucie Nawen.
             </p>
           </section>
 

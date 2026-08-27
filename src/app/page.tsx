@@ -146,7 +146,7 @@ export default function Home() {
               <Link
                 key={chicha.id}
                 href={`/commande?open=${chicha.id}`}
-                className="group relative flex aspect-[4/3] w-full flex-col overflow-hidden rounded-2xl"
+                className="group relative flex aspect-square w-full flex-col overflow-hidden rounded-2xl"
               >
                 {chicha.image && (
                   <Image
