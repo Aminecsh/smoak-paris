@@ -7,6 +7,9 @@ import {
   sweetSupplements,
   drinkSurcharge,
   sweetSurcharge,
+  physicalChichaCount,
+  PHYSICAL_CHICHA_ID,
+  PHYSICAL_CHICHA_NAME,
 } from "@/lib/chicha";
 
 export interface OrderItemInput {
@@ -146,7 +149,11 @@ export function buildOrder(payload: {
       },
     });
 
-    stockDecrements.push({ id: base.id, name: base.name, quantity: chicha.quantity });
+    stockDecrements.push({
+      id: PHYSICAL_CHICHA_ID,
+      name: PHYSICAL_CHICHA_NAME,
+      quantity: chicha.quantity * physicalChichaCount(base),
+    });
     stockDecrements.push({ id: flavor.id, name: flavor.name, quantity: chicha.quantity });
     if (secondFlavor) {
       stockDecrements.push({

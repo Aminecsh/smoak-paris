@@ -100,3 +100,17 @@ export function drinkSurcharge(drink: ChichaSupplement): number {
 export function sweetSurcharge(sweet: ChichaSupplement): number {
   return surcharge(sweet.price, INCLUDED_SWEET_PRICE);
 }
+
+// Un pack n'est pas une référence physique séparée : c'est un bundle de
+// chichas "Quasar" (le seul modèle physique en stock). Le stock à décrémenter
+// est donc toujours celui de "quasar", multiplié par le nombre de chichas
+// que la configuration utilise réellement (1 pour une chicha seule ou le
+// Pack Chicha Sucré, 2 pour le Duo, 3 pour la Soirée).
+export const PHYSICAL_CHICHA_ID = "quasar";
+export const PHYSICAL_CHICHA_NAME = "Chicha Quasar";
+
+export function physicalChichaCount(base: ChichaBase): number {
+  if (base.isSoiree) return 3;
+  if (base.isDuo) return 2;
+  return 1;
+}
