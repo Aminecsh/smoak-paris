@@ -21,7 +21,6 @@ export default function MentionsLegalesPage() {
             </p>
             <ul className="mt-3 flex flex-col gap-1.5">
               <li>Adresse du siège : 8 rue Tronchet, Paris</li>
-              <li>SIRET : [À COMPLÉTER — en cours d&apos;immatriculation]</li>
               <li>Téléphone : {SERVICE_PHONE_DISPLAY}</li>
               <li>Email : smoak.paris@gmail.com</li>
             </ul>
