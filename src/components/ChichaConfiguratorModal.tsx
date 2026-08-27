@@ -7,6 +7,8 @@ import {
   rechargeSupplement,
   drinkSupplements,
   sweetSupplements,
+  drinkSurcharge,
+  sweetSurcharge,
 } from "@/lib/chicha";
 import { ChichaBase, ChichaFlavor, ChichaSupplement } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
@@ -62,15 +64,19 @@ function SupplementList({
   selectedId,
   onSelect,
   name,
+  surchargeFor,
 }: {
   items: ChichaSupplement[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   name: string;
+  surchargeFor: (item: ChichaSupplement) => number;
 }) {
   return (
     <div className="mt-3 flex flex-col gap-2">
-      {items.map((item) => (
+      {items.map((item) => {
+        const extra = surchargeFor(item);
+        return (
         <label
           key={item.id}
           className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
@@ -89,7 +95,14 @@ function SupplementList({
                 className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
               />
             )}
-            <span className="truncate text-ink">{item.name}</span>
+            <span className="truncate text-ink">
+              {item.name}
+              {extra > 0 && (
+                <span className="ml-2 font-mono text-xs text-muted">
+                  +{extra.toFixed(2)} €
+                </span>
+              )}
+            </span>
           </span>
           <input
             type="radio"
@@ -100,7 +113,8 @@ function SupplementList({
             className="h-4 w-4 flex-shrink-0 accent-signal"
           />
         </label>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -163,22 +177,45 @@ export default function ChichaConfiguratorModal({
   const packSweet = sweetSupplements.find((s) => s.id === packSweetId);
 
   const selectedDrinks =
-    isPack && packDrink ? [{ id: packDrink.id, name: packDrink.name, price: 0 }] : [];
+    isPack && packDrink
+      ? [{ id: packDrink.id, name: packDrink.name, price: drinkSurcharge(packDrink) }]
+      : [];
   const selectedSweets =
-    isPack && packSweet ? [{ id: packSweet.id, name: packSweet.name, price: 0 }] : [];
+    isPack && packSweet
+      ? [{ id: packSweet.id, name: packSweet.name, price: sweetSurcharge(packSweet) }]
+      : [];
 
-  const unitPrice = chicha.price + (recharge ? rechargeSupplement.price : 0);
+  const soireeDrinkSurchargeTotal = isSoiree
+    ? soireeDrinkIds.reduce((sum, id) => {
+        const drink = drinkSupplements.find((d) => d.id === id);
+        return sum + (drink ? drinkSurcharge(drink) : 0);
+      }, 0)
+    : 0;
+  const soireeSweetSurchargeTotal = isSoiree
+    ? soireeSweetIds.reduce((sum, id) => {
+        const sweet = sweetSupplements.find((s) => s.id === id);
+        return sum + (sweet ? sweetSurcharge(sweet) : 0);
+      }, 0)
+    : 0;
+
+  const unitPrice =
+    chicha.price +
+    (recharge ? rechargeSupplement.price : 0) +
+    (isPack && packDrink ? drinkSurcharge(packDrink) : 0) +
+    (isPack && packSweet ? sweetSurcharge(packSweet) : 0) +
+    soireeDrinkSurchargeTotal +
+    soireeSweetSurchargeTotal;
 
   const handleAdd = () => {
     if (isSoiree) {
       const flavors = soireeFlavorIds.map((id) => chichaFlavors.find((f) => f.id === id)!);
       const drinks = soireeDrinkIds.map((id) => {
         const drink = drinkSupplements.find((d) => d.id === id)!;
-        return { id: drink.id, name: drink.name, price: 0 };
+        return { id: drink.id, name: drink.name, price: drinkSurcharge(drink) };
       });
       const sweets = soireeSweetIds.map((id) => {
         const sweet = sweetSupplements.find((s) => s.id === id)!;
-        return { id: sweet.id, name: sweet.name, price: 0 };
+        return { id: sweet.id, name: sweet.name, price: sweetSurcharge(sweet) };
       });
 
       addConfiguredChicha({
@@ -194,7 +231,7 @@ export default function ChichaConfiguratorModal({
         recharge: false,
         drinks,
         sweets,
-        unitPrice: chicha.price,
+        unitPrice,
         quantity,
       });
     } else {
@@ -378,6 +415,7 @@ export default function ChichaConfiguratorModal({
                 selectedId={packDrinkId}
                 onSelect={setPackDrinkId}
                 name="pack-drink"
+                surchargeFor={drinkSurcharge}
               />
             </section>
           )}
@@ -392,6 +430,7 @@ export default function ChichaConfiguratorModal({
                 selectedId={packSweetId}
                 onSelect={setPackSweetId}
                 name="pack-sweet"
+                surchargeFor={sweetSurcharge}
               />
             </section>
           )}
@@ -418,6 +457,7 @@ export default function ChichaConfiguratorModal({
                   selectedId={soireeDrinkIds[step - 1]}
                   onSelect={(id) => setSoireeDrinkIds((ids) => updateAt(ids, step - 1, id))}
                   name={`soiree-drink-${step}`}
+                  surchargeFor={drinkSurcharge}
                 />
               </section>
 
@@ -430,6 +470,7 @@ export default function ChichaConfiguratorModal({
                   selectedId={soireeSweetIds[step - 1]}
                   onSelect={(id) => setSoireeSweetIds((ids) => updateAt(ids, step - 1, id))}
                   name={`soiree-sweet-${step}`}
+                  surchargeFor={sweetSurcharge}
                 />
               </section>
             </>

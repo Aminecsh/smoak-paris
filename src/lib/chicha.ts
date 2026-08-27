@@ -5,12 +5,15 @@ import { products } from "./products";
 // choisit la base, puis on personnalise (goût, recharge, extras).
 //
 // Cohérence des tarifs (base = Chicha Quasar à 30€) :
-// - Pack Chicha Sucré = chicha + 1 boisson (~2€) + 1 bonbon (~2,90-3,90€)
-//   inclus, valeur à l'unité ~35-36€ → pack à 35€ (léger avantage).
+// - Pack Chicha Sucré = chicha + 1 boisson standard (2€) + 1 bonbon
+//   standard (2,90€) inclus → pack à 35€. Une boisson/bonbon plus cher
+//   (Red Bull, format 1L5, Popcorn Caramel...) ajoute la différence de
+//   prix en supplément (voir drinkSurcharge / sweetSurcharge).
 // - Pack Duo = 2 chichas complètes (2×30€ = 60€ à l'unité) → pack à 55€
 //   (avantage duo de 5€).
-// - Pack Soirée = 3 chichas + 3 boissons + 3 bonbons inclus (valeur à
-//   l'unité ~90€ de chichas + ~15€ de boissons/bonbons) → pack à 95€.
+// - Pack Soirée = 3 chichas + 3 boissons + 3 bonbons standard inclus
+//   (valeur à l'unité ~90€ de chichas + ~15€ de boissons/bonbons) → pack
+//   à 95€, mêmes suppléments que le Pack Chicha Sucré au-delà du standard.
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
@@ -78,3 +81,22 @@ export const drinkSupplements: ChichaSupplement[] = products
 export const sweetSupplements: ChichaSupplement[] = products
   .filter((p) => p.category === "Épicerie sucrée")
   .map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image }));
+
+// Prix "standard" d'une boisson/sucrerie incluse gratuitement dans un pack
+// (canette classique, sachet Fini). Au-delà, la différence avec le prix
+// catalogue réel est facturée en supplément (ex : Red Bull, formats 1L5,
+// Popcorn Caramel) — cohérent quel que soit le produit choisi.
+export const INCLUDED_DRINK_PRICE = 2;
+export const INCLUDED_SWEET_PRICE = 2.9;
+
+function surcharge(price: number, includedPrice: number): number {
+  return Math.max(0, Math.round((price - includedPrice) * 100) / 100);
+}
+
+export function drinkSurcharge(drink: ChichaSupplement): number {
+  return surcharge(drink.price, INCLUDED_DRINK_PRICE);
+}
+
+export function sweetSurcharge(sweet: ChichaSupplement): number {
+  return surcharge(sweet.price, INCLUDED_SWEET_PRICE);
+}

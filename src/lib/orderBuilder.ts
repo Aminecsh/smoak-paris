@@ -5,6 +5,8 @@ import {
   rechargeSupplement,
   drinkSupplements,
   sweetSupplements,
+  drinkSurcharge,
+  sweetSurcharge,
 } from "@/lib/chicha";
 
 export interface OrderItemInput {
@@ -116,10 +118,14 @@ export function buildOrder(payload: {
       return { error: "Sucrerie en supplément inconnue" };
     }
 
-    // Les boissons/bonbons d'un pack sont inclus dans le prix affiché
-    // (chichaBases[].price) — ils ne s'ajoutent pas au tarif, contrairement
-    // à la tête en plus qui est un vrai supplément payant.
-    const unitPrice = base.price + (chicha.recharge ? rechargeSupplement.price : 0);
+    // Un choix de boisson/bonbon "standard" est inclus dans le prix affiché
+    // (chichaBases[].price) ; un choix plus cher (Red Bull, format 1L5,
+    // Popcorn Caramel...) ajoute la différence de prix en supplément.
+    const unitPrice =
+      base.price +
+      (chicha.recharge ? rechargeSupplement.price : 0) +
+      drinks.reduce((sum, d) => sum + drinkSurcharge(d!), 0) +
+      sweets.reduce((sum, s) => sum + sweetSurcharge(s!), 0);
 
     const flavorNames = [flavor.name, secondFlavor?.name, thirdFlavor?.name]
       .filter(Boolean)
