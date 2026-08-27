@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { products } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { groupSupplementLines } from "@/lib/cartDisplay";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import {
   DELIVERY_SLOTS,
@@ -147,8 +148,26 @@ export default function LivraisonPage() {
         <ul className="flex flex-col gap-1.5 text-sm text-muted">
           {configuredChichas.map((c) => (
             <li key={c.id} className="flex justify-between gap-2">
-              <span className="truncate">
-                {c.quantity} × {c.chichaName} — {c.flavorName}
+              <span>
+                <span className="block">
+                  {c.quantity} × {c.chichaName} — {c.flavorName}
+                  {c.secondFlavorName ? ` + ${c.secondFlavorName}` : ""}
+                </span>
+                {(c.recharge || c.drinks.length > 0 || c.sweets.length > 0) && (
+                  <span className="mt-0.5 block text-xs text-muted">
+                    {[
+                      c.recharge ? "Tête en plus" : null,
+                      ...groupSupplementLines(c.drinks).map(
+                        (drink) => `${drink.quantity > 1 ? `${drink.quantity}× ` : ""}${drink.name}`,
+                      ),
+                      ...groupSupplementLines(c.sweets).map(
+                        (sweet) => `${sweet.quantity > 1 ? `${sweet.quantity}× ` : ""}${sweet.name}`,
+                      ),
+                    ]
+                      .filter(Boolean)
+                      .join(" + ")}
+                  </span>
+                )}
               </span>
               <span className="flex-shrink-0 font-mono font-semibold text-signal">
                 {(c.unitPrice * c.quantity).toFixed(2)} €
