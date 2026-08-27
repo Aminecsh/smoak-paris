@@ -17,6 +17,10 @@ import { sendPushToAll } from "@/lib/notifications/push";
 import { formatOrderReference } from "@/lib/orderNumber";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
+// Filet de sécurité : after() (envoi email/push, géocodage de repli) continue
+// de tourner après la réponse, dans la limite de ce délai.
+export const maxDuration = 30;
+
 interface OrderPayload {
   customer: {
     name: string;
@@ -117,11 +121,12 @@ export async function POST(request: NextRequest) {
   );
 
   // Si le client a choisi une suggestion de l'autocomplétion, on a déjà des
-  // coordonnées fiables — sinon on géocode l'adresse tapée en repli.
-  const geo =
-    addressPoint && Number.isFinite(addressPoint.lat) && Number.isFinite(addressPoint.lng)
-      ? addressPoint
-      : await geocodeAddress(`${street.trim()}, ${postalCode.trim()} ${city.trim()}`);
+  // coordonnées fiables. Sinon, on crée la commande sans coordonnées et on
+  // géocode l'adresse tapée en repli après coup (via after()) — l'appel
+  // externe ne doit jamais retarder la réponse au client.
+  const hasReliableGeo =
+    addressPoint && Number.isFinite(addressPoint.lat) && Number.isFinite(addressPoint.lng);
+  const geo = hasReliableGeo ? addressPoint : null;
 
   const supabase = getSupabaseServerClient();
 
@@ -166,6 +171,18 @@ export async function POST(request: NextRequest) {
   // latence cumulée (géocodage + RPC + email + push) pouvait dépasser le
   // délai de la fonction serverless et faire échouer la commande.
   after(async () => {
+    if (!hasReliableGeo) {
+      const fallbackGeo = await geocodeAddress(
+        `${street.trim()}, ${postalCode.trim()} ${city.trim()}`,
+      );
+      if (fallbackGeo) {
+        await supabase
+          .from("orders")
+          .update({ delivery_lat: fallbackGeo.lat, delivery_lng: fallbackGeo.lng })
+          .eq("id", order.id);
+      }
+    }
+
     const notification = await sendTrackingLink({
       firstName: name.trim().split(" ")[0],
       phone: phone.trim(),
