@@ -53,6 +53,14 @@ export default function ResendTrackingLink({
     );
   }
 
+  if (channel === null) {
+    return (
+      <p className="mt-2 text-xs text-muted">
+        Envoi du lien de suivi en cours...
+      </p>
+    );
+  }
+
   return (
     <div className="mt-2 rounded-lg border border-border bg-white p-3 text-xs text-muted">
       <p>Le lien de suivi n&apos;a pas pu être envoyé par email.</p>

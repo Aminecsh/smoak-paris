@@ -112,7 +112,14 @@ export default function LivraisonPage() {
         }),
       });
 
-      const data = await res.json();
+      let data: { id?: string; error?: string };
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(
+          "Le serveur a mis trop de temps à répondre, réessaie dans un instant",
+        );
+      }
       if (!res.ok) {
         throw new Error(data.error ?? "Une erreur est survenue");
       }

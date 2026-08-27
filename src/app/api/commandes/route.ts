@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { geocodeAddress } from "@/lib/geocode";
 import {
@@ -160,25 +160,32 @@ export async function POST(request: NextRequest) {
   }
 
   const trackingUrl = `${request.nextUrl.origin}/commande/suivi/${order.id}`;
-  const notification = await sendTrackingLink({
-    firstName: name.trim().split(" ")[0],
-    phone: phone.trim(),
-    email: email.trim(),
-    trackingUrl,
-  });
 
-  await supabase
-    .from("orders")
-    .update({
-      notification_channel: notification.channel,
-      notification_error: notification.error ?? null,
-    })
-    .eq("id", order.id);
+  // L'envoi de l'email de suivi et la notification push aux livreurs ne
+  // doivent pas retarder la réponse au client — surtout sur mobile où la
+  // latence cumulée (géocodage + RPC + email + push) pouvait dépasser le
+  // délai de la fonction serverless et faire échouer la commande.
+  after(async () => {
+    const notification = await sendTrackingLink({
+      firstName: name.trim().split(" ")[0],
+      phone: phone.trim(),
+      email: email.trim(),
+      trackingUrl,
+    });
 
-  await sendPushToAll({
-    title: "Nouvelle commande",
-    body: `${formatOrderReference(order.order_number)} — ${totalPrice.toFixed(2)} €`,
-    url: `/livreur/${order.id}`,
+    await supabase
+      .from("orders")
+      .update({
+        notification_channel: notification.channel,
+        notification_error: notification.error ?? null,
+      })
+      .eq("id", order.id);
+
+    await sendPushToAll({
+      title: "Nouvelle commande",
+      body: `${formatOrderReference(order.order_number)} — ${totalPrice.toFixed(2)} €`,
+      url: `/livreur/${order.id}`,
+    });
   });
 
   return NextResponse.json(
@@ -186,7 +193,6 @@ export async function POST(request: NextRequest) {
       id: order.id,
       orderNumber: order.order_number,
       totalPrice,
-      notificationChannel: notification.channel,
     },
     { status: 201 },
   );
