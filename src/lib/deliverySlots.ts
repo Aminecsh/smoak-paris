@@ -80,8 +80,7 @@ export function getEarlyReturnSlots(deliverySlot: string): string[] {
 export const SPONTANEOUS_DELIVERY_MINUTES = 45;
 
 export function isSlotOrderingOpen(now: Date = new Date()): boolean {
-  const hour = now.getHours();
-  return hour >= 12 && hour < 21;
+  return now.getHours() < 21;
 }
 
 // Calcule l'heure de livraison estimée d'une commande spontanée, au format

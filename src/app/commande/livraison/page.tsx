@@ -312,7 +312,7 @@ export default function LivraisonPage() {
           </div>
         )}
 
-        {isSpontaneous ? (
+        {isSpontaneous && (
           <div className="rounded-lg border border-border bg-secondary p-4">
             <p className="text-sm font-semibold text-ink">
               Livraison spontanée — environ {SPONTANEOUS_DELIVERY_MINUTES} min
@@ -324,33 +324,45 @@ export default function LivraisonPage() {
               restituée 2h après la livraison.
             </p>
           </div>
-        ) : (
-          <div>
-            <label className="text-xs font-semibold text-muted">
-              Créneau de livraison
-            </label>
-            <div className="mt-1 grid grid-cols-4 gap-2">
-              {DELIVERY_SLOTS.map((slot) => (
-                <label
-                  key={slot}
-                  className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
-                    deliverySlot === slot
-                      ? "border-signal bg-secondary text-ink"
-                      : "border-border text-muted"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="deliverySlot"
-                    value={slot}
-                    checked={deliverySlot === slot}
-                    onChange={() => setDeliverySlot(slot)}
-                    className="sr-only"
-                  />
-                  {formatSlotLabel(slot)}
-                </label>
-              ))}
-            </div>
+        )}
+
+        <div>
+          <label className="text-xs font-semibold text-muted">
+            Créneau de livraison
+            {isSpontaneous && (
+              <span className="ml-1 font-normal normal-case text-muted">
+                — fermés après 21h
+              </span>
+            )}
+          </label>
+          <div
+            className={`mt-1 grid grid-cols-4 gap-2 ${isSpontaneous ? "opacity-40" : ""}`}
+          >
+            {DELIVERY_SLOTS.map((slot) => (
+              <label
+                key={slot}
+                className={`flex items-center justify-center rounded-lg border px-2 py-2 text-sm ${
+                  isSpontaneous
+                    ? "cursor-not-allowed border-border text-muted"
+                    : deliverySlot === slot
+                      ? "cursor-pointer border-signal bg-secondary text-ink"
+                      : "cursor-pointer border-border text-muted"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="deliverySlot"
+                  value={slot}
+                  checked={!isSpontaneous && deliverySlot === slot}
+                  disabled={isSpontaneous}
+                  onChange={() => setDeliverySlot(slot)}
+                  className="sr-only"
+                />
+                {formatSlotLabel(slot)}
+              </label>
+            ))}
+          </div>
+          {!isSpontaneous && (
             <p className="mt-2 text-xs text-muted">
               La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
               {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
@@ -358,8 +370,8 @@ export default function LivraisonPage() {
               commandes deviennent spontanées (livrées en ~
               {SPONTANEOUS_DELIVERY_MINUTES} min).
             </p>
-          </div>
-        )}
+          )}
+        </div>
 
         <div>
           <label className="text-xs font-semibold text-muted">
