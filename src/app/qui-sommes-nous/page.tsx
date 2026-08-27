@@ -1,4 +1,11 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Qui sommes-nous",
+  description:
+    "Smoak Paris, c'est une équipe qui livre et reprend en personne des chichas premium sans tabac ni nicotine, à Paris et en Île-de-France.",
+};
 
 const PROCESS = [
   { n: "01", title: "Vous choisissez", desc: "Tête, goût et intensité, sur le configurateur." },

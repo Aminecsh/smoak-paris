@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { checkStockPassword, stockSessionCookie } from "@/lib/stockAuth";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`stock-login:${ip}`, 5, 5 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Trop de tentatives, réessayez dans quelques minutes" },
+      { status: 429 },
+    );
+  }
+
   const { password } = await request.json().catch(() => ({ password: "" }));
 
   if (typeof password !== "string" || !checkStockPassword(password)) {

@@ -1,10 +1,17 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   SERVICE_PHONE_DISPLAY,
   SERVICE_PHONE_NUMBER,
   SERVICE_WHATSAPP_NUMBER,
 } from "@/lib/contact";
 import { DELIVERY_SLOTS, formatSlotLabel, LAST_RETURN_LABEL } from "@/lib/deliverySlots";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Une question sur une commande ou une livraison de chicha à Paris ? Contactez Smoak Paris par téléphone ou WhatsApp.",
+};
 
 const ZONES = [
   { label: "Secteur Sud-Est", value: "Paris (5·11·12·13·14·20) · 77 · 91 · 94" },

@@ -12,7 +12,12 @@ function expectedSessionValue(): string {
 }
 
 export function checkStockPassword(candidate: string): boolean {
-  return candidate === process.env.STOCK_PASSWORD;
+  const password = process.env.STOCK_PASSWORD;
+  if (!password) return false;
+  const expected = Buffer.from(password);
+  const actual = Buffer.from(candidate);
+  if (expected.length !== actual.length) return false;
+  return timingSafeEqual(expected, actual);
 }
 
 export function stockSessionCookie() {

@@ -15,6 +15,7 @@ import {
 import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
 import { sendPushToAll } from "@/lib/notifications/push";
 import { formatOrderReference } from "@/lib/orderNumber";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 interface OrderPayload {
   customer: {
@@ -38,6 +39,14 @@ const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
 const POSTAL_CODE_PATTERN = /^\d{5}$/;
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`create-order:${ip}`, 8, 10 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Trop de commandes envoyées, réessayez dans quelques minutes" },
+      { status: 429 },
+    );
+  }
+
   let payload: OrderPayload;
   try {
     payload = await request.json();
