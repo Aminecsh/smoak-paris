@@ -43,6 +43,27 @@ const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
 const POSTAL_CODE_PATTERN = /^\d{5}$/;
 
 export async function POST(request: NextRequest) {
+  try {
+    return await handlePost(request);
+  } catch (err) {
+    // Filet de sécurité : toute exception non prévue ici finissait comme une
+    // page d'erreur générique non-JSON côté plateforme, que le client ne
+    // pouvait pas parser — d'où un message d'erreur trompeur ("trop de temps
+    // à répondre") qui masquait la vraie cause. On journalise la vraie
+    // erreur (visible dans les logs Vercel) et on renvoie toujours du JSON.
+    console.error("POST /api/commandes a échoué :", err);
+    // TEMPORAIRE : on affiche le détail de l'erreur pour diagnostiquer le
+    // crash en prod. À remplacer par un message générique une fois la cause
+    // trouvée et corrigée.
+    const detail = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { error: `Erreur inattendue : ${detail}` },
+      { status: 500 },
+    );
+  }
+}
+
+async function handlePost(request: NextRequest) {
   const ip = getClientIp(request);
   if (!checkRateLimit(`create-order:${ip}`, 8, 10 * 60 * 1000)) {
     return NextResponse.json(
