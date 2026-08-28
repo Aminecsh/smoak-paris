@@ -52,12 +52,8 @@ export async function POST(request: NextRequest) {
     // à répondre") qui masquait la vraie cause. On journalise la vraie
     // erreur (visible dans les logs Vercel) et on renvoie toujours du JSON.
     console.error("POST /api/commandes a échoué :", err);
-    // TEMPORAIRE : on affiche le détail de l'erreur pour diagnostiquer le
-    // crash en prod. À remplacer par un message générique une fois la cause
-    // trouvée et corrigée.
-    const detail = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
-      { error: `Erreur inattendue : ${detail}` },
+      { error: "Erreur inattendue, réessaie dans un instant" },
       { status: 500 },
     );
   }
