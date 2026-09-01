@@ -236,7 +236,7 @@ async function handlePost(request: NextRequest) {
       url: `/livreur/${order.id}`,
     });
 
-    await sendTelegramMessage(
+    const telegramResults = await sendTelegramMessage(
       [
         `🔔 Nouvelle commande ${formatOrderReference(order.order_number)}`,
         `${totalPrice.toFixed(2)} € — ${paymentMethod === "cb" ? "CB" : "Espèces"}`,
@@ -245,6 +245,21 @@ async function handlePost(request: NextRequest) {
       ].join("\n"),
       { replyMarkup: buildOrderStatusKeyboard(order.id, "recue") },
     );
+
+    // Mémorise l'id du message envoyé à chaque cofondateur : quand l'un
+    // clique un bouton, le webhook édite tous ces messages en même temps
+    // pour que les autres voient le statut avancer aussi.
+    const messageIds = Object.fromEntries(
+      telegramResults
+        .filter((r): r is typeof r & { messageId: number } => r.ok && r.messageId != null)
+        .map((r) => [r.chatId, r.messageId]),
+    );
+    if (Object.keys(messageIds).length > 0) {
+      await supabase
+        .from("orders")
+        .update({ telegram_message_ids: messageIds })
+        .eq("id", order.id);
+    }
   });
 
   return NextResponse.json(

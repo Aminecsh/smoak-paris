@@ -66,12 +66,13 @@ export async function POST(request: NextRequest) {
 
   // Un autre cofondateur a peut-être déjà fait avancer le statut depuis un
   // autre chat entre-temps : on ne laisse jamais un bouton périmé faire
-  // reculer la commande, et on resynchronise ce message-là sur l'état réel.
+  // reculer la commande, et on resynchronise tous les messages sur l'état
+  // réel (pas seulement celui sur lequel on vient de cliquer).
   const { data: existing } = await supabase
     .from("orders")
-    .select("status")
+    .select("status, telegram_message_ids")
     .eq("id", orderId)
-    .single<{ status: string }>();
+    .single<{ status: string; telegram_message_ids: Record<string, number> | null }>();
 
   if (!existing) {
     await answerCallback("Commande introuvable");
@@ -101,18 +102,32 @@ export async function POST(request: NextRequest) {
     await answerCallback(`Statut mis à jour : ${ORDER_STATUS_LABELS[finalStatus]}`);
   }
 
+  // Édite le message dans tous les chats connus pour cette commande (pas
+  // seulement celui d'où vient le clic), pour que les autres cofondateurs
+  // voient le statut avancer aussi. Le message qui a reçu le clic est
+  // toujours inclus, même s'il manquait de la table (défensif).
+  const messageIds: Record<string, number> = { ...(existing.telegram_message_ids ?? {}) };
   if (messageId && chatId) {
-    await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        message_id: messageId,
-        text: `${messageText}\n\n✅ ${ORDER_STATUS_LABELS[finalStatus]}`,
-        reply_markup: buildOrderStatusKeyboard(orderId, finalStatus),
-      }),
-    }).catch(() => {});
+    messageIds[chatId] = messageId;
   }
+
+  const newText = `${messageText}\n\n✅ ${ORDER_STATUS_LABELS[finalStatus]}`;
+  const newKeyboard = buildOrderStatusKeyboard(orderId, finalStatus);
+
+  await Promise.all(
+    Object.entries(messageIds).map(([cid, mid]) =>
+      fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: cid,
+          message_id: mid,
+          text: newText,
+          reply_markup: newKeyboard,
+        }),
+      }).catch(() => {}),
+    ),
+  );
 
   return NextResponse.json({ ok: true });
 }
