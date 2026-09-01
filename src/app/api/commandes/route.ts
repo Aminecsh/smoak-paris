@@ -2,16 +2,18 @@ import { NextRequest, NextResponse, after } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { geocodeAddress } from "@/lib/geocode";
 import {
+  formatSlotLabel,
   getSpontaneousDeliverySlot,
   isDeliverySlot,
   isSlotOrderingOpen,
   isWithinOpeningHours,
 } from "@/lib/deliverySlots";
-import { getDeliveryZone, isInIleDeFrance } from "@/lib/deliveryZones";
+import { DELIVERY_ZONE_LABELS, getDeliveryZone, isInIleDeFrance } from "@/lib/deliveryZones";
 import {
   buildOrder,
   type ConfiguredChichaInput,
   type OrderItemInput,
+  type OrderItemRow,
 } from "@/lib/orderBuilder";
 import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
 import { sendPushToAll } from "@/lib/notifications/push";
@@ -43,6 +45,27 @@ interface OrderPayload {
 const VALID_PAYMENT_METHODS = ["cb", "especes"];
 const PHONE_PATTERN = /^\+[1-9]\d{0,3}( \d{1,2})+$/;
 const POSTAL_CODE_PATTERN = /^\d{5}$/;
+
+// Une ligne de commande pour la notif Telegram — nom, prix, et les extras
+// (tête en plus, boissons, sucreries) sur une deuxième ligne indentée pour
+// les chichas configurées.
+function formatItemLine(row: OrderItemRow): string {
+  const base = `• ${row.quantity}× ${row.name} — ${(row.unit_price * row.quantity).toFixed(2)} €`;
+  if (row.kind !== "chicha" || !row.details) return base;
+
+  const d = row.details as {
+    recharge?: boolean;
+    drinks?: string[];
+    sweets?: string[];
+  };
+  const extras = [
+    d.recharge ? "tête en plus" : null,
+    ...(d.drinks ?? []),
+    ...(d.sweets ?? []),
+  ].filter((x): x is string => Boolean(x));
+
+  return extras.length > 0 ? `${base}\n   + ${extras.join(", ")}` : base;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -239,8 +262,17 @@ async function handlePost(request: NextRequest) {
     const telegramResults = await sendTelegramMessage(
       [
         `🔔 Nouvelle commande ${formatOrderReference(order.order_number)}`,
-        `${totalPrice.toFixed(2)} € — ${paymentMethod === "cb" ? "CB" : "Espèces"}`,
-        `${name.trim()} — ${street.trim()}, ${postalCode.trim()} ${city.trim()}`,
+        `🕒 ${deliverySlot !== undefined ? `Créneau : ${formatSlotLabel(resolvedDeliverySlot)}` : `Dès que possible — livraison estimée ${formatSlotLabel(resolvedDeliverySlot)}`}`,
+        "",
+        "🧾 Contenu :",
+        itemRows.map(formatItemLine).join("\n"),
+        "",
+        `💰 Total : ${totalPrice.toFixed(2)} € — ${paymentMethod === "cb" ? "Carte bancaire" : "Espèces"}`,
+        "",
+        `👤 ${name.trim()} — ${phone.trim()}`,
+        `📍 ${street.trim()}, ${postalCode.trim()} ${city.trim()} (${DELIVERY_ZONE_LABELS[deliveryZone]})`,
+        ...(payload.customer.note?.trim() ? [`📝 ${payload.customer.note.trim()}`] : []),
+        "",
         `${request.nextUrl.origin}/livreur/${order.id}`,
       ].join("\n"),
       { replyMarkup: buildOrderStatusKeyboard(order.id, "recue") },
