@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { isValidStockSession, STOCK_COOKIE_NAME } from "@/lib/stockAuth";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
-
-const VALID_STATUSES = ["recue", "en_preparation", "en_livraison", "livree"];
+import { isOrderStatus } from "@/lib/orderStatus";
 
 export async function POST(
   request: NextRequest,
@@ -16,7 +15,7 @@ export async function POST(
 
   const { id } = await ctx.params;
   const { status } = await request.json().catch(() => ({}));
-  if (!VALID_STATUSES.includes(status)) {
+  if (!isOrderStatus(status)) {
     return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
   }
 

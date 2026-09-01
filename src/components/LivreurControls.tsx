@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const STATUSES = [
-  { key: "recue", label: "Reçue" },
-  { key: "en_preparation", label: "En préparation" },
-  { key: "en_livraison", label: "En livraison" },
-  { key: "livree", label: "Livrée" },
-];
+import { ORDER_STATUSES, ORDER_STATUS_LABELS } from "@/lib/orderStatus";
 
 export default function LivreurControls({
   orderId,
@@ -83,19 +77,19 @@ export default function LivreurControls({
           Statut
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          {STATUSES.map((s) => (
+          {ORDER_STATUSES.map((s) => (
             <button
-              key={s.key}
+              key={s}
               type="button"
-              disabled={updating || s.key === status}
-              onClick={() => updateStatus(s.key)}
+              disabled={updating || s === status}
+              onClick={() => updateStatus(s)}
               className={`rounded-lg px-4 py-2 text-xs font-semibold transition-colors disabled:opacity-50 ${
-                s.key === status
+                s === status
                   ? "bg-signal text-white"
                   : "border border-border text-ink hover:bg-secondary"
               }`}
             >
-              {s.label}
+              {ORDER_STATUS_LABELS[s]}
             </button>
           ))}
         </div>
