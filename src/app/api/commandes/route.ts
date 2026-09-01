@@ -15,6 +15,7 @@ import {
 } from "@/lib/orderBuilder";
 import { sendTrackingLink } from "@/lib/notifications/sendTrackingLink";
 import { sendPushToAll } from "@/lib/notifications/push";
+import { sendTelegramMessage } from "@/lib/notifications/telegram";
 import { formatOrderReference } from "@/lib/orderNumber";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
@@ -234,6 +235,15 @@ async function handlePost(request: NextRequest) {
       body: `${formatOrderReference(order.order_number)} — ${totalPrice.toFixed(2)} €`,
       url: `/livreur/${order.id}`,
     });
+
+    await sendTelegramMessage(
+      [
+        `🔔 Nouvelle commande ${formatOrderReference(order.order_number)}`,
+        `${totalPrice.toFixed(2)} € — ${paymentMethod === "cb" ? "CB" : "Espèces"}`,
+        `${name.trim()} — ${street.trim()}, ${postalCode.trim()} ${city.trim()}`,
+        `${request.nextUrl.origin}/livreur/${order.id}`,
+      ].join("\n"),
+    );
   });
 
   return NextResponse.json(
