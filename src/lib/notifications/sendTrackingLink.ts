@@ -1,4 +1,5 @@
 import { sendEmail } from "./email";
+import { renderTrackingEmail } from "./emailTemplates";
 
 export type NotificationChannel = "email" | "failed";
 
@@ -15,7 +16,7 @@ export async function sendTrackingLink(params: {
   const emailResult = await sendEmail(
     email,
     "Suivez votre commande Smoak Paris",
-    `<p>Bonjour ${firstName},</p><p>Voici le lien pour suivre votre commande Smoak Paris :</p><p><a href="${trackingUrl}">${trackingUrl}</a></p>`,
+    renderTrackingEmail({ firstName, trackingUrl }),
   );
   if (emailResult.ok) {
     return { channel: "email" };

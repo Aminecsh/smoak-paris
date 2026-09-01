@@ -9,6 +9,7 @@ import {
   DRIVER_PHONE_NUMBERS,
   SERVICE_PHONE_DISPLAY,
   SERVICE_PHONE_NUMBER,
+  SERVICE_WHATSAPP_NUMBER,
 } from "@/lib/contact";
 import { formatOrderReference } from "@/lib/orderNumber";
 import type { DeliveryZone } from "@/lib/deliveryZones";
@@ -58,6 +59,26 @@ export default function SuiviPage({
   const { id } = use(params);
   const [data, setData] = useState<TrackingData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [returnRequested, setReturnRequested] = useState(false);
+  const [returnRequesting, setReturnRequesting] = useState(false);
+  const [returnError, setReturnError] = useState<string | null>(null);
+
+  const requestReturn = async () => {
+    setReturnError(null);
+    setReturnRequesting(true);
+    try {
+      const res = await fetch(`/api/commandes/${id}/request-return`, { method: "POST" });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error ?? "Une erreur est survenue");
+      }
+      setReturnRequested(true);
+    } catch (err) {
+      setReturnError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setReturnRequesting(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -177,11 +198,33 @@ export default function SuiviPage({
             Votre commande a été livrée. Bon moment ✨
           </p>
 
+          {returnRequested ? (
+            <p className="mt-4 rounded-lg bg-white px-5 py-3 text-xs font-semibold text-ink">
+              Demande envoyée ✅ — l&apos;équipe arrive bientôt récupérer le matériel.
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={requestReturn}
+              disabled={returnRequesting}
+              className="mt-4 block w-full rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:opacity-60"
+            >
+              {returnRequesting ? "Envoi..." : "Je veux la rendre maintenant"}
+            </button>
+          )}
+          {returnError && (
+            <p className="mt-2 text-xs text-red-600" role="alert">
+              {returnError}
+            </p>
+          )}
+
           <a
-            href={`tel:${SERVICE_PHONE_NUMBER}`}
-            className="mt-4 inline-block w-full rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
+            href={`https://wa.me/${SERVICE_WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 block text-xs font-medium text-muted underline hover:text-ink"
           >
-            Je veux la rendre maintenant — {SERVICE_PHONE_DISPLAY}
+            Ou écris-nous sur WhatsApp
           </a>
         </div>
       )}
