@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
   { href: "/commande", label: "Commander" },
   { href: "/contact", label: "Contact" },
+  { href: "/commande/retrouver", label: "Retrouver ma commande" },
 ];
 
 export default function Footer() {

@@ -40,7 +40,11 @@ const FAQ = [
   },
   {
     q: "Que se passe-t-il si je dois écourter la session ?",
-    a: "Prévenez-nous sur WhatsApp, on ajuste l'heure de reprise directement depuis votre lien de suivi.",
+    a: "Prévenez-nous sur WhatsApp ou par téléphone, on s'adapte pour repasser plus tôt.",
+  },
+  {
+    q: "J'ai perdu le lien de suivi de ma commande, comment faire ?",
+    a: "Va sur la page \"Retrouver ma commande\" (en bas de chaque page du site), entre ton numéro de téléphone : tu reçois à nouveau le lien par email.",
   },
 ];
 
