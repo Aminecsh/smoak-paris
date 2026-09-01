@@ -35,6 +35,26 @@ export function getReturnTimeLabel(slot: string): string {
 
 export const LAST_RETURN_LABEL = getReturnTimeLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1]);
 
+// Toute la logique de créneaux raisonne en heure de Paris, jamais l'heure
+// locale du runtime qui exécute le code : en production (Vercel), les
+// fonctions serverless tournent en UTC, alors que le client (navigateur du
+// visiteur) raisonne en heure de Paris — sans ça, le serveur et le client se
+// contredisent sur l'heure pendant tout le décalage été/hiver (jusqu'à 2h),
+// avec des commandes rejetées à tort ("Créneau de livraison invalide").
+const PARIS_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Paris",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+function parisTimeParts(now: Date): { hour: number; minute: number } {
+  const parts = PARIS_TIME_FORMATTER.formatToParts(now);
+  const hour = Number(parts.find((p) => p.type === "hour")!.value);
+  const minute = Number(parts.find((p) => p.type === "minute")!.value);
+  return { hour, minute };
+}
+
 // Minutes continues sur la "nuit de service" : 22h-23h30 gardent leur valeur,
 // 00h-01h30 (après minuit) sont décalées de +24h pour rester croissantes par
 // rapport à la veille au soir.
@@ -56,8 +76,8 @@ function slotToContinuousMinutes(slot: string): number {
 }
 
 function nowContinuousMinutes(): number {
-  const now = new Date();
-  return toContinuousMinutes(now.getHours(), now.getMinutes());
+  const { hour, minute } = parisTimeParts(new Date());
+  return toContinuousMinutes(hour, minute);
 }
 
 // Créneaux de 30 min disponibles pour une reprise anticipée : de maintenant
@@ -80,14 +100,15 @@ export function getEarlyReturnSlots(deliverySlot: string): string[] {
 export const SPONTANEOUS_DELIVERY_MINUTES = 45;
 
 export function isSlotOrderingOpen(now: Date = new Date()): boolean {
-  return now.getHours() < 21;
+  return parisTimeParts(now).hour < 21;
 }
 
 // Calcule l'heure de livraison estimée d'une commande spontanée, au format
 // "HH:MM" — même format que les créneaux classiques, pour rester compatible
 // avec le reste du système (heure de restitution, reprise anticipée...).
 export function getSpontaneousDeliverySlot(now: Date = new Date()): string {
-  const total = (now.getHours() * 60 + now.getMinutes() + SPONTANEOUS_DELIVERY_MINUTES) % (24 * 60);
+  const { hour, minute } = parisTimeParts(now);
+  const total = (hour * 60 + minute + SPONTANEOUS_DELIVERY_MINUTES) % (24 * 60);
   const h = Math.floor(total / 60);
   const m = total % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
