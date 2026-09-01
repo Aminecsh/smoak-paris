@@ -100,6 +100,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
     await answerCallback(`Statut mis à jour : ${ORDER_STATUS_LABELS[finalStatus]}`);
+
+    // Le partage de position en direct passe par le site (accès GPS du
+    // téléphone, impossible depuis un simple bouton Telegram) — on envoie
+    // le lien direct à la personne qui vient de se mettre en livraison.
+    if (finalStatus === "en_livraison" && chatId) {
+      await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `📍 Ouvre ce lien pour partager ta position en direct avec le client :\n${request.nextUrl.origin}/livreur/${orderId}`,
+        }),
+      }).catch(() => {});
+    }
   }
 
   // Édite le message dans tous les chats connus pour cette commande (pas
