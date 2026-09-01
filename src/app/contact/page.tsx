@@ -5,7 +5,7 @@ import {
   SERVICE_PHONE_NUMBER,
   SERVICE_WHATSAPP_NUMBER,
 } from "@/lib/contact";
-import { DELIVERY_SLOTS, formatSlotLabel, LAST_RETURN_LABEL } from "@/lib/deliverySlots";
+import { DELIVERY_SLOTS, OPENING_HOURS_LABEL, formatSlotLabel } from "@/lib/deliverySlots";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -19,20 +19,20 @@ const ZONES = [
 ];
 
 const HORAIRES = [
+  { label: "Service ouvert", value: OPENING_HOURS_LABEL },
   {
-    label: "Créneaux de livraison",
+    label: "Créneaux précis",
     value: `${formatSlotLabel(DELIVERY_SLOTS[0])} — ${formatSlotLabel(
       DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1],
     )}`,
   },
-  { label: "Reprise du matériel", value: `Au plus tard ${LAST_RETURN_LABEL}` },
   { label: "Jours", value: "7j/7" },
 ];
 
 const FAQ = [
   {
     q: "Combien de temps avant la livraison ?",
-    a: "Avant 21h, vous réservez un créneau pour la soirée. À partir de 21h, les créneaux ferment et chaque commande est spontanée : livrée en ~45 minutes.",
+    a: "Vous choisissez : livraison immédiate (~45 min, disponible de 18h à 4h) ou un créneau précis pour la soirée, réservable jusqu'à 21h.",
   },
   {
     q: "Qui vient livrer et reprendre la chicha ?",

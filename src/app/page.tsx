@@ -6,7 +6,7 @@ import { chichaBases } from "@/lib/chicha";
 import OrderTab from "@/components/OrderTab";
 
 const STATS: { value: string; label: string; withStar?: boolean; live?: boolean }[] = [
-  { value: "45 min", label: "Livraison spontanée" },
+  { value: "45 min", label: "Livraison immédiate" },
   { value: "50 chichas", label: "Dans notre flotte" },
   { value: "4.8/5", label: "Avis Trustpilot", withStar: true },
   { value: "180+", label: "Commandes livrées", live: true },

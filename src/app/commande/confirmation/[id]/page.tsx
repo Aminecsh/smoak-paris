@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
-import { formatSlotLabel, getReturnTimeLabel } from "@/lib/deliverySlots";
+import { formatSlotLabel } from "@/lib/deliverySlots";
 import { DELIVERY_ZONE_LABELS, type DeliveryZone } from "@/lib/deliveryZones";
 import { formatOrderReference } from "@/lib/orderNumber";
 import ResendTrackingLink from "@/components/ResendTrackingLink";
@@ -117,8 +117,7 @@ export default async function ConfirmationPage(
         )}
         {order.delivery_slot && (
           <p className="mt-2 text-sm text-muted">
-            Créneau : {formatSlotLabel(order.delivery_slot)} — chicha à rendre
-            avant {getReturnTimeLabel(order.delivery_slot)}
+            Livraison estimée : {formatSlotLabel(order.delivery_slot)}
           </p>
         )}
         {order.delivery_note && (

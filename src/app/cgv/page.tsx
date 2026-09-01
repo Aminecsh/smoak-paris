@@ -1,5 +1,5 @@
 import { SERVICE_PHONE_DISPLAY, SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
-import { DELIVERY_SLOTS, formatSlotLabel, LAST_RETURN_LABEL } from "@/lib/deliverySlots";
+import { DELIVERY_SLOTS, OPENING_HOURS_LABEL, formatSlotLabel } from "@/lib/deliverySlots";
 
 export default function CgvPage() {
   return (
@@ -68,14 +68,16 @@ export default function CgvPage() {
             </h2>
             <p className="mt-3">
               Les commandes sont passées en ligne et livrées en Île-de-France,
-              selon un créneau choisi par le client parmi les créneaux
-              disponibles ({formatSlotLabel(DELIVERY_SLOTS[0])} —{" "}
-              {formatSlotLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1])}). Un
-              lien de suivi est transmis au client pour suivre sa commande en
-              temps réel. Smoak Paris s&apos;efforce de respecter les délais
-              annoncés mais ne saurait être tenu responsable de retards liés à
-              des circonstances hors de son contrôle (circulation, conditions
-              météorologiques, etc.).
+              soit dès que possible pendant les horaires d&apos;ouverture du
+              service ({OPENING_HOURS_LABEL}), soit à un créneau précis choisi
+              par le client parmi les créneaux disponibles (
+              {formatSlotLabel(DELIVERY_SLOTS[0])} —{" "}
+              {formatSlotLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1])},
+              réservable jusqu&apos;à 21h). Un lien de suivi est transmis au
+              client pour suivre sa commande en temps réel. Smoak Paris
+              s&apos;efforce de respecter les délais annoncés mais ne saurait
+              être tenu responsable de retards liés à des circonstances hors
+              de son contrôle (circulation, conditions météorologiques, etc.).
             </p>
           </section>
 
@@ -86,13 +88,11 @@ export default function CgvPage() {
             <p className="mt-3">
               Une caution de 10€ est demandée à la livraison. Elle est
               intégralement rendue au client lors de la reprise du matériel
-              par le livreur. La chicha livrée doit être restituée au plus
-              tard à l&apos;heure limite indiquée sur la page de suivi de
-              commande (au plus tard {LAST_RETURN_LABEL} pour le dernier
-              créneau de la soirée), sauf reprise anticipée demandée par le
-              client. Si le matériel est rendu cassé ou endommagé, ou s&apos;il
-              n&apos;est pas restitué (matériel disparu), la caution est
-              conservée par Smoak Paris.
+              par le livreur. La chicha livrée doit être restituée au livreur
+              environ 2 heures après la livraison, sauf reprise anticipée
+              demandée par le client. Si le matériel est rendu cassé ou
+              endommagé, ou s&apos;il n&apos;est pas restitué (matériel
+              disparu), la caution est conservée par Smoak Paris.
             </p>
           </section>
 

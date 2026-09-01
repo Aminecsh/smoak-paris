@@ -5,7 +5,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import StockLogin from "@/components/StockLogin";
 import LivreurControls from "@/components/LivreurControls";
 import { formatOrderReference } from "@/lib/orderNumber";
-import { formatSlotLabel, getReturnTimeLabel } from "@/lib/deliverySlots";
+import { formatSlotLabel } from "@/lib/deliverySlots";
 import { DELIVERY_ZONE_LABELS, type DeliveryZone } from "@/lib/deliveryZones";
 
 interface OrderItemRow {
@@ -26,7 +26,6 @@ interface OrderRow {
   payment_method: string;
   delivery_zone: DeliveryZone | null;
   delivery_slot: string | null;
-  early_return_slot: string | null;
 }
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -48,7 +47,7 @@ export default async function LivreurOrderPage(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, delivery_address, delivery_note, total_price, status, payment_method, delivery_zone, delivery_slot, early_return_slot",
+      "id, order_number, customer_name, customer_phone, delivery_address, delivery_note, total_price, status, payment_method, delivery_zone, delivery_slot",
     )
     .eq("id", id)
     .single<OrderRow>();
@@ -83,9 +82,7 @@ export default async function LivreurOrderPage(
         )}
         {order.delivery_slot && (
           <p className="mt-2 text-sm font-medium text-ink">
-            {order.early_return_slot
-              ? `Reprise anticipée demandée à ${formatSlotLabel(order.early_return_slot)}`
-              : `Reprise prévue à ${getReturnTimeLabel(order.delivery_slot)}`}
+            Livraison estimée : {formatSlotLabel(order.delivery_slot)}
           </p>
         )}
       </div>

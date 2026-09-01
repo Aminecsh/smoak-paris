@@ -5,6 +5,7 @@ import {
   getSpontaneousDeliverySlot,
   isDeliverySlot,
   isSlotOrderingOpen,
+  isWithinOpeningHours,
 } from "@/lib/deliverySlots";
 import { getDeliveryZone, isInIleDeFrance } from "@/lib/deliveryZones";
 import {
@@ -112,17 +113,30 @@ async function handlePost(request: NextRequest) {
   if (paymentMethod && !VALID_PAYMENT_METHODS.includes(paymentMethod)) {
     return NextResponse.json({ error: "Moyen de paiement invalide" }, { status: 400 });
   }
-  // L'heure serveur fait foi (pas celle du client) : avant 21h on exige un
-  // créneau valide parmi la liste ; à partir de 21h, la commande est
-  // spontanée et l'heure de livraison est calculée ici, quoi qu'ait envoyé
-  // le client.
+  // L'heure serveur (Paris) fait foi, pas celle du client. Le client demande
+  // soit un créneau précis (deliverySlot fourni — fermé après 21h), soit la
+  // livraison immédiate (deliverySlot absent — fermée en dehors de 18h-4h) ;
+  // chaque mode a sa propre fenêtre, indépendamment de ce qu'affichait le
+  // client au moment de l'envoi.
   let resolvedDeliverySlot: string;
-  if (isSlotOrderingOpen()) {
+  if (deliverySlot !== undefined) {
+    if (!isSlotOrderingOpen()) {
+      return NextResponse.json(
+        { error: "Les créneaux précis sont fermés pour ce soir" },
+        { status: 400 },
+      );
+    }
     if (!isDeliverySlot(deliverySlot)) {
       return NextResponse.json({ error: "Créneau de livraison invalide" }, { status: 400 });
     }
     resolvedDeliverySlot = deliverySlot;
   } else {
+    if (!isWithinOpeningHours()) {
+      return NextResponse.json(
+        { error: "Livraison dès que possible indisponible en dehors de nos horaires" },
+        { status: 400 },
+      );
+    }
     resolvedDeliverySlot = getSpontaneousDeliverySlot();
   }
 

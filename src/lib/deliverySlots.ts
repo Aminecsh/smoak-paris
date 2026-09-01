@@ -94,18 +94,32 @@ export function getEarlyReturnSlots(deliverySlot: string): string[] {
   return slots;
 }
 
-// Au-delà de 21h (et jusqu'au petit matin), on ne réserve plus un créneau
-// pour la soirée : la commande est "spontanée", livrée ~45 min après
-// l'achat. Avant 21h, on choisit un créneau parmi DELIVERY_SLOTS.
-export const SPONTANEOUS_DELIVERY_MINUTES = 45;
-
+// Avant 21h (heure de Paris), on peut réserver un créneau précis parmi
+// DELIVERY_SLOTS pour la soirée. Passé 21h, réserver un créneau n'a plus de
+// sens (il serait déjà écoulé ou imminent) : seule la livraison immédiate
+// reste proposée.
 export function isSlotOrderingOpen(now: Date = new Date()): boolean {
   return parisTimeParts(now).hour < 21;
 }
 
-// Calcule l'heure de livraison estimée d'une commande spontanée, au format
-// "HH:MM" — même format que les créneaux classiques, pour rester compatible
-// avec le reste du système (heure de restitution, reprise anticipée...).
+// Livraison "dès que possible" — le client choisit ce mode plutôt qu'un
+// créneau précis. Disponible pendant les horaires d'ouverture du service
+// (18h à 4h, heure de Paris) ; en dehors, seul un créneau précis reste
+// réservable (utile pour précommander l'après-midi pour le soir même).
+export const OPENING_HOUR = 18;
+export const CLOSING_HOUR = 4;
+export const SPONTANEOUS_DELIVERY_MINUTES = 45;
+
+export function isWithinOpeningHours(now: Date = new Date()): boolean {
+  const { hour } = parisTimeParts(now);
+  return hour >= OPENING_HOUR || hour < CLOSING_HOUR;
+}
+
+export const OPENING_HOURS_LABEL = `${OPENING_HOUR}h – ${CLOSING_HOUR}h`;
+
+// Calcule l'heure de livraison estimée d'une commande "dès que possible", au
+// format "HH:MM" — même format que les créneaux classiques, pour rester
+// compatible avec le reste du système.
 export function getSpontaneousDeliverySlot(now: Date = new Date()): string {
   const { hour, minute } = parisTimeParts(now);
   const total = (hour * 60 + minute + SPONTANEOUS_DELIVERY_MINUTES) % (24 * 60);

@@ -5,11 +5,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import OrderStatusStepper from "@/components/OrderStatusStepper";
 import {
-  formatSlotLabel,
-  getEarlyReturnSlots,
-  getReturnTimeLabel,
-} from "@/lib/deliverySlots";
-import {
   DRIVER_PHONE_DISPLAYS,
   DRIVER_PHONE_NUMBERS,
   SERVICE_PHONE_DISPLAY,
@@ -63,9 +58,6 @@ export default function SuiviPage({
   const { id } = use(params);
   const [data, setData] = useState<TrackingData | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [showEarlyReturnPicker, setShowEarlyReturnPicker] = useState(false);
-  const [earlyReturnSubmitting, setEarlyReturnSubmitting] = useState(false);
-  const [earlyReturnError, setEarlyReturnError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,28 +85,6 @@ export default function SuiviPage({
       clearTimeout(timer);
     };
   }, [id]);
-
-  const chooseEarlyReturnSlot = async (slot: string) => {
-    setEarlyReturnError(null);
-    setEarlyReturnSubmitting(true);
-    try {
-      const res = await fetch(`/api/commandes/${id}/early-return`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slot }),
-      });
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error ?? "Une erreur est survenue");
-      }
-      setData((d) => (d ? { ...d, earlyReturnSlot: slot } : d));
-      setShowEarlyReturnPicker(false);
-    } catch (err) {
-      setEarlyReturnError(err instanceof Error ? err.message : "Une erreur est survenue");
-    } finally {
-      setEarlyReturnSubmitting(false);
-    }
-  };
 
   if (notFound) {
     return (
@@ -146,8 +116,6 @@ export default function SuiviPage({
   const driverPhoneDisplay = data.deliveryZone
     ? DRIVER_PHONE_DISPLAYS[data.deliveryZone]
     : SERVICE_PHONE_DISPLAY;
-
-  const earlyReturnSlots = data.deliverySlot ? getEarlyReturnSlots(data.deliverySlot) : [];
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-10 sm:px-6">
@@ -208,13 +176,6 @@ export default function SuiviPage({
           <p className="text-sm text-muted">
             Votre commande a été livrée. Bon moment ✨
           </p>
-          {data.deliverySlot && (
-            <p className="mt-2 text-sm font-medium text-ink">
-              {data.earlyReturnSlot
-                ? `Votre livreur reviendra chercher la chicha à ${formatSlotLabel(data.earlyReturnSlot)}.`
-                : `Votre livreur reviendra chercher la chicha à ${getReturnTimeLabel(data.deliverySlot)}.`}
-            </p>
-          )}
 
           <a
             href={`tel:${SERVICE_PHONE_NUMBER}`}
@@ -222,46 +183,6 @@ export default function SuiviPage({
           >
             Je veux la rendre maintenant — {SERVICE_PHONE_DISPLAY}
           </a>
-
-          {!showEarlyReturnPicker ? (
-            <button
-              type="button"
-              onClick={() => setShowEarlyReturnPicker(true)}
-              className="mt-3 block w-full rounded-lg border border-border bg-white px-5 py-3 text-xs font-semibold text-ink transition-colors hover:bg-secondary"
-            >
-              Rendre ma chicha plus tôt
-            </button>
-          ) : (
-            <div className="mt-3 rounded-xl border border-border bg-white p-4 text-left">
-              <p className="text-xs font-semibold text-muted">
-                Choisis un créneau
-              </p>
-              {earlyReturnSlots.length > 0 ? (
-                <div className="mt-2 grid grid-cols-4 gap-2">
-                  {earlyReturnSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      disabled={earlyReturnSubmitting}
-                      onClick={() => chooseEarlyReturnSlot(slot)}
-                      className="rounded-lg border border-border px-2 py-2 text-sm text-muted transition-colors hover:border-signal hover:bg-secondary hover:text-ink disabled:opacity-60"
-                    >
-                      {formatSlotLabel(slot)}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-2 text-xs text-muted">
-                  Aucun créneau plus tôt disponible — appelle-nous directement.
-                </p>
-              )}
-              {earlyReturnError && (
-                <p className="mt-2 text-xs text-red-600" role="alert">
-                  {earlyReturnError}
-                </p>
-              )}
-            </div>
-          )}
         </div>
       )}
 

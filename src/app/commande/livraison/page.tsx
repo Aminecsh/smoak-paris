@@ -9,11 +9,11 @@ import { groupSupplementLines } from "@/lib/cartDisplay";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import {
   DELIVERY_SLOTS,
-  LAST_RETURN_LABEL,
+  OPENING_HOURS_LABEL,
   SPONTANEOUS_DELIVERY_MINUTES,
   formatSlotLabel,
-  getReturnTimeLabel,
   isSlotOrderingOpen,
+  isWithinOpeningHours,
 } from "@/lib/deliverySlots";
 import {
   COUNTRY_OPTIONS,
@@ -48,7 +48,21 @@ export default function LivraisonPage() {
   );
   const [note, setNote] = useState("");
   const [deliverySlot, setDeliverySlot] = useState<string>(DELIVERY_SLOTS[0]);
-  const [isSpontaneous] = useState(() => !isSlotOrderingOpen());
+  const [deliveryMode, setDeliveryMode] = useState<"asap" | "scheduled">("asap");
+  // Calculés une fois au montage (heure de Paris, cf. lib/deliverySlots) :
+  // les créneaux précis ferment à 21h, la livraison immédiate n'est
+  // proposée que pendant les horaires d'ouverture (18h–4h) — il reste
+  // toujours au moins une des deux options disponible.
+  const [asapAvailable] = useState(() => isWithinOpeningHours());
+  const [scheduledAvailable] = useState(() => isSlotOrderingOpen());
+  const effectiveMode: "asap" | "scheduled" =
+    deliveryMode === "asap"
+      ? asapAvailable
+        ? "asap"
+        : "scheduled"
+      : scheduledAvailable
+        ? "scheduled"
+        : "asap";
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("especes");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +107,7 @@ export default function LivraisonPage() {
             addressPoint: { lat: addressSelection.lat, lng: addressSelection.lng },
             note,
             paymentMethod,
-            deliverySlot: isSpontaneous ? undefined : deliverySlot,
+            deliverySlot: effectiveMode === "scheduled" ? deliverySlot : undefined,
           },
           items: items.map((item) => ({
             productId: item.productId,
@@ -327,63 +341,102 @@ export default function LivraisonPage() {
           </div>
         )}
 
-        {isSpontaneous && (
-          <div className="rounded-lg border border-border bg-secondary p-4">
-            <p className="text-sm font-semibold text-ink">
-              Livraison spontanée — environ {SPONTANEOUS_DELIVERY_MINUTES} min
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              Les créneaux réservés à l&apos;avance ferment à 21h. Ta commande
-              part tout de suite en préparation, livrée en ~
-              {SPONTANEOUS_DELIVERY_MINUTES} minutes. La chicha devra être
-              restituée 2h après la livraison.
-            </p>
-          </div>
-        )}
-
         <div>
           <label className="text-xs font-semibold text-muted">
-            Créneau de livraison
-            {isSpontaneous && (
-              <span className="ml-1 font-normal normal-case text-muted">
-                — fermés après 21h
-              </span>
-            )}
+            Horaire de livraison
           </label>
-          <div
-            className={`mt-1 grid grid-cols-4 gap-2 ${isSpontaneous ? "opacity-40" : ""}`}
-          >
-            {DELIVERY_SLOTS.map((slot) => (
-              <label
-                key={slot}
-                className={`flex items-center justify-center rounded-lg border px-2 py-2 text-sm ${
-                  isSpontaneous
-                    ? "cursor-not-allowed border-border text-muted"
-                    : deliverySlot === slot
-                      ? "cursor-pointer border-signal bg-secondary text-ink"
-                      : "cursor-pointer border-border text-muted"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="deliverySlot"
-                  value={slot}
-                  checked={!isSpontaneous && deliverySlot === slot}
-                  disabled={isSpontaneous}
-                  onChange={() => setDeliverySlot(slot)}
-                  className="sr-only"
-                />
-                {formatSlotLabel(slot)}
-              </label>
-            ))}
+
+          {!asapAvailable && (
+            <p className="mt-1.5 rounded-lg bg-secondary px-3 py-2 text-xs text-muted">
+              Livraison dès que possible disponible de {OPENING_HOURS_LABEL}.
+              Choisissez un horaire ci-dessous.
+            </p>
+          )}
+          {!scheduledAvailable && (
+            <p className="mt-1.5 rounded-lg bg-secondary px-3 py-2 text-xs text-muted">
+              Les créneaux précis ferment à 21h pour la soirée — livraison dès
+              que possible uniquement.
+            </p>
+          )}
+
+          <div className="mt-1 grid grid-cols-2 gap-3">
+            <label
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-4 py-2.5 text-center text-sm ${
+                !asapAvailable
+                  ? "cursor-not-allowed border-border text-muted opacity-50"
+                  : effectiveMode === "asap"
+                    ? "cursor-pointer border-signal bg-secondary text-ink"
+                    : "cursor-pointer border-border text-muted"
+              }`}
+            >
+              <input
+                type="radio"
+                name="deliveryMode"
+                value="asap"
+                checked={effectiveMode === "asap"}
+                disabled={!asapAvailable}
+                onChange={() => setDeliveryMode("asap")}
+                className="sr-only"
+              />
+              Dès que possible
+              <span className="text-xs font-normal text-muted">
+                {asapAvailable ? `~${SPONTANEOUS_DELIVERY_MINUTES} min` : "fermé"}
+              </span>
+            </label>
+            <label
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border px-4 py-2.5 text-center text-sm ${
+                !scheduledAvailable
+                  ? "cursor-not-allowed border-border text-muted opacity-50"
+                  : effectiveMode === "scheduled"
+                    ? "cursor-pointer border-signal bg-secondary text-ink"
+                    : "cursor-pointer border-border text-muted"
+              }`}
+            >
+              <input
+                type="radio"
+                name="deliveryMode"
+                value="scheduled"
+                checked={effectiveMode === "scheduled"}
+                disabled={!scheduledAvailable}
+                onChange={() => setDeliveryMode("scheduled")}
+                className="sr-only"
+              />
+              Choisir un horaire
+              <span className="text-xs font-normal text-muted">
+                {scheduledAvailable ? "créneau précis" : "fermé"}
+              </span>
+            </label>
           </div>
-          {!isSpontaneous && (
+
+          {effectiveMode === "scheduled" && (
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {DELIVERY_SLOTS.map((slot) => (
+                <label
+                  key={slot}
+                  className={`flex cursor-pointer items-center justify-center rounded-lg border px-2 py-2 text-sm ${
+                    deliverySlot === slot
+                      ? "border-signal bg-secondary text-ink"
+                      : "border-border text-muted"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="deliverySlot"
+                    value={slot}
+                    checked={deliverySlot === slot}
+                    onChange={() => setDeliverySlot(slot)}
+                    className="sr-only"
+                  />
+                  {formatSlotLabel(slot)}
+                </label>
+              ))}
+            </div>
+          )}
+
+          {effectiveMode === "asap" && (
             <p className="mt-2 text-xs text-muted">
-              La chicha doit être restituée 2h après la livraison (au plus tard à{" "}
-              {getReturnTimeLabel(deliverySlot)}, dernière reprise possible à{" "}
-              {LAST_RETURN_LABEL}). Après 21h, les créneaux ferment et les
-              commandes deviennent spontanées (livrées en ~
-              {SPONTANEOUS_DELIVERY_MINUTES} min).
+              On vous livre dès que la commande est prête, généralement sous{" "}
+              {SPONTANEOUS_DELIVERY_MINUTES} minutes.
             </p>
           )}
         </div>

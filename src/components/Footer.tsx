@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SERVICE_PHONE_DISPLAY, SERVICE_PHONE_NUMBER, SERVICE_WHATSAPP_NUMBER } from "@/lib/contact";
-import { DELIVERY_SLOTS, formatSlotLabel } from "@/lib/deliverySlots";
+import { OPENING_HOURS_LABEL } from "@/lib/deliverySlots";
 
 const NAV_LINKS = [
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
@@ -51,11 +51,8 @@ export default function Footer() {
             </span>
             <ul className="mt-4 flex flex-col gap-2.5 text-sm text-white/60">
               <li>Paris et Île-de-France</li>
-              <li>
-                {formatSlotLabel(DELIVERY_SLOTS[0])} —{" "}
-                {formatSlotLabel(DELIVERY_SLOTS[DELIVERY_SLOTS.length - 1])}, 7j/7
-              </li>
-              <li>Créneaux jusqu&apos;à 21h, spontané ensuite (~45 min)</li>
+              <li>{OPENING_HOURS_LABEL}, 7j/7</li>
+              <li>Immédiat ou créneau réservable jusqu&apos;à 21h</li>
             </ul>
           </div>
 
