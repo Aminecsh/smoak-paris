@@ -4,22 +4,22 @@ import { products } from "./products";
 // Les chichas SMOAK proposées à la composition, façon Uber Eats : on
 // choisit la base, puis on personnalise (goût, recharge, extras).
 //
-// Cohérence des tarifs (base = Chicha Quasar à 30€) :
+// Cohérence des tarifs (base = Chicha Quasar à 50€) :
 // - Pack Chicha Sucré = chicha + 1 boisson standard (2€) + 1 bonbon
-//   standard (2,90€) inclus → pack à 35€. Une boisson/bonbon plus cher
+//   standard (2,90€) inclus → pack à 55€. Une boisson/bonbon plus cher
 //   (Red Bull, format 1L5, Popcorn Caramel...) ajoute la différence de
 //   prix en supplément (voir drinkSurcharge / sweetSurcharge).
-// - Pack Duo = 2 chichas complètes (2×30€ = 60€ à l'unité) → pack à 55€
+// - Pack Duo = 2 chichas complètes (2×50€ = 100€ à l'unité) → pack à 95€
 //   (avantage duo de 5€).
 // - Pack Soirée = 3 chichas + 3 boissons + 3 bonbons standard inclus
-//   (valeur à l'unité ~90€ de chichas + ~15€ de boissons/bonbons) → pack
-//   à 95€, mêmes suppléments que le Pack Chicha Sucré au-delà du standard.
+//   (valeur à l'unité ~150€ de chichas + ~15€ de boissons/bonbons) → pack
+//   à 155€, mêmes suppléments que le Pack Chicha Sucré au-delà du standard.
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
     name: "Chicha Quasar",
     description: "Une chicha complète, prête à fumer.",
-    price: 30,
+    price: 50,
     emoji: "🌌",
     image: "/produits/chicha-quasar.jpg",
   },
@@ -27,7 +27,7 @@ export const chichaBases: ChichaBase[] = [
     id: "pack-chicha-sucre",
     name: "Pack Chicha Sucré",
     description: "Une chicha + une boisson + un bonbon au choix, en pack.",
-    price: 35,
+    price: 55,
     emoji: "",
     image: "/produits/pack-zahma.jpg",
     isPack: true,
@@ -36,7 +36,7 @@ export const chichaBases: ChichaBase[] = [
     id: "pack-duo",
     name: "Pack Duo",
     description: "Deux chichas complètes, chacune avec son goût au choix.",
-    price: 55,
+    price: 95,
     emoji: "",
     image: "/produits/pack-duo.jpg",
     isDuo: true,
@@ -45,7 +45,7 @@ export const chichaBases: ChichaBase[] = [
     id: "pack-soiree",
     name: "Pack Soirée",
     description: "Trois chichas complètes, chacune avec son goût, sa boisson et son bonbon au choix.",
-    price: 95,
+    price: 155,
     emoji: "",
     image: "/produits/pack-soiree.jpg",
     isSoiree: true,
