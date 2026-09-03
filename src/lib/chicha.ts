@@ -8,7 +8,7 @@ export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
     name: "Chicha Quasar",
-    description: "Une chicha complète, prête à fumer.",
+    description: "Une chicha Quasar, prête à fumer.",
     price: 40,
     emoji: "🌌",
     image: "/produits/chicha-quasar.jpg",
@@ -17,7 +17,7 @@ export const chichaBases: ChichaBase[] = [
   {
     id: "pack-duo",
     name: "Pack Duo",
-    description: "Deux chichas complètes, chacune avec son goût au choix.",
+    description: "Deux chichas Quasar, chacune avec son goût au choix.",
     price: 70,
     emoji: "",
     image: "/produits/pack-duo.jpg",
@@ -26,7 +26,7 @@ export const chichaBases: ChichaBase[] = [
   {
     id: "pack-soiree",
     name: "Pack Trio",
-    description: "Trois chichas complètes, chacune avec son goût au choix.",
+    description: "Trois chichas Quasar, chacune avec son goût au choix.",
     price: 100,
     emoji: "",
     image: "/produits/pack-duo.jpg",
@@ -49,7 +49,7 @@ export const rechargeSupplement: ChichaSupplement & {
   id: "recharge",
   name: "Tête en plus",
   description: "Charbon, briquet et goût inclus.",
-  price: 15,
+  price: 10,
   image: "/produits/Recharge.png",
 };
 
