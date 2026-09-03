@@ -2,53 +2,35 @@ import { ChichaBase, ChichaFlavor, ChichaSupplement } from "./types";
 import { products } from "./products";
 
 // Les chichas SMOAK proposées à la composition, façon Uber Eats : on
-// choisit la base, puis on personnalise (goût, recharge, extras).
-//
-// Cohérence des tarifs (base = Chicha Quasar à 50€) :
-// - Pack Chicha Sucré = chicha + 1 boisson standard (2€) + 1 bonbon
-//   standard (2,90€) inclus → pack à 55€. Une boisson/bonbon plus cher
-//   (Red Bull, format 1L5, Popcorn Caramel...) ajoute la différence de
-//   prix en supplément (voir drinkSurcharge / sweetSurcharge).
-// - Pack Duo = 2 chichas complètes (2×50€ = 100€ à l'unité) → pack à 95€
-//   (avantage duo de 5€).
-// - Pack Soirée = 3 chichas + 3 boissons + 3 bonbons standard inclus
-//   (valeur à l'unité ~150€ de chichas + ~15€ de boissons/bonbons) → pack
-//   à 155€, mêmes suppléments que le Pack Chicha Sucré au-delà du standard.
+// choisit un pack (1, 2 ou 3 chichas), puis on choisit le goût de chacune.
+// Prix par palier, dégressif sur le nombre de chichas : 40€ / 70€ / 100€.
 export const chichaBases: ChichaBase[] = [
   {
     id: "quasar",
     name: "Chicha Quasar",
     description: "Une chicha complète, prête à fumer.",
-    price: 50,
+    price: 40,
     emoji: "🌌",
     image: "/produits/chicha-quasar.jpg",
-  },
-  {
-    id: "pack-chicha-sucre",
-    name: "Pack Chicha Sucré",
-    description: "Une chicha + une boisson + un bonbon au choix, en pack.",
-    price: 55,
-    emoji: "",
-    image: "/produits/pack-zahma.jpg",
-    isPack: true,
+    chichaCount: 1,
   },
   {
     id: "pack-duo",
     name: "Pack Duo",
     description: "Deux chichas complètes, chacune avec son goût au choix.",
-    price: 95,
+    price: 70,
     emoji: "",
     image: "/produits/pack-duo.jpg",
-    isDuo: true,
+    chichaCount: 2,
   },
   {
     id: "pack-soiree",
-    name: "Pack Soirée",
-    description: "Trois chichas complètes, chacune avec son goût, sa boisson et son bonbon au choix.",
-    price: 155,
+    name: "Pack Trio",
+    description: "Trois chichas complètes, chacune avec son goût au choix.",
+    price: 100,
     emoji: "",
-    image: "/produits/pack-soiree.jpg",
-    isSoiree: true,
+    image: "/produits/pack-duo.jpg",
+    chichaCount: 3,
   },
 ];
 
@@ -82,12 +64,12 @@ export const sweetSupplements: ChichaSupplement[] = products
   .filter((p) => p.category === "Épicerie sucrée")
   .map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image }));
 
-// Prix "standard" d'une boisson/sucrerie incluse gratuitement dans un pack
-// (canette classique, sachet Fini). Au-delà, la différence avec le prix
-// catalogue réel est facturée en supplément (ex : Red Bull, formats 1L5,
-// Popcorn Caramel) — cohérent quel que soit le produit choisi.
+// Prix "standard" de référence pour une boisson/sucrerie (canette classique,
+// sachet Fini) — sert de base au calcul de supplément si jamais une
+// boisson/sucrerie est incluse dans une configuration (utilisé par
+// orderBuilder, plus par le composeur actuel qui vend les chichas seules).
 export const INCLUDED_DRINK_PRICE = 2;
-export const INCLUDED_SWEET_PRICE = 2.9;
+export const INCLUDED_SWEET_PRICE = 3;
 
 function surcharge(price: number, includedPrice: number): number {
   return Math.max(0, Math.round((price - includedPrice) * 100) / 100);
@@ -103,14 +85,10 @@ export function sweetSurcharge(sweet: ChichaSupplement): number {
 
 // Un pack n'est pas une référence physique séparée : c'est un bundle de
 // chichas "Quasar" (le seul modèle physique en stock). Le stock à décrémenter
-// est donc toujours celui de "quasar", multiplié par le nombre de chichas
-// que la configuration utilise réellement (1 pour une chicha seule ou le
-// Pack Chicha Sucré, 2 pour le Duo, 3 pour la Soirée).
+// est donc toujours celui de "quasar", multiplié par chichaCount.
 export const PHYSICAL_CHICHA_ID = "quasar";
 export const PHYSICAL_CHICHA_NAME = "Chicha Quasar";
 
 export function physicalChichaCount(base: ChichaBase): number {
-  if (base.isSoiree) return 3;
-  if (base.isDuo) return 2;
-  return 1;
+  return base.chichaCount;
 }

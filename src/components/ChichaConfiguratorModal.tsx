@@ -2,15 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  chichaFlavors,
-  rechargeSupplement,
-  drinkSupplements,
-  sweetSupplements,
-  drinkSurcharge,
-  sweetSurcharge,
-} from "@/lib/chicha";
-import { ChichaBase, ChichaFlavor, ChichaSupplement } from "@/lib/types";
+import { chichaFlavors, rechargeSupplement } from "@/lib/chicha";
+import { ChichaBase, ChichaFlavor } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 
 function FlavorGrid({
@@ -59,66 +52,6 @@ function FlavorGrid({
   );
 }
 
-function SupplementList({
-  items,
-  selectedId,
-  onSelect,
-  name,
-  surchargeFor,
-}: {
-  items: ChichaSupplement[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-  name: string;
-  surchargeFor: (item: ChichaSupplement) => number;
-}) {
-  return (
-    <div className="mt-3 flex flex-col gap-2">
-      {items.map((item) => {
-        const extra = surchargeFor(item);
-        return (
-        <label
-          key={item.id}
-          className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors ${
-            selectedId === item.id
-              ? "border-signal bg-secondary"
-              : "border-border hover:bg-secondary/60"
-          }`}
-        >
-          <span className="flex min-w-0 items-center gap-3">
-            {item.image && (
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={40}
-                height={40}
-                className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-              />
-            )}
-            <span className="truncate text-ink">
-              {item.name}
-              {extra > 0 && (
-                <span className="ml-2 font-mono text-xs text-muted">
-                  +{extra.toFixed(2)} €
-                </span>
-              )}
-            </span>
-          </span>
-          <input
-            type="radio"
-            name={name}
-            value={item.id}
-            checked={selectedId === item.id}
-            onChange={() => onSelect(item.id)}
-            className="h-4 w-4 flex-shrink-0 accent-signal"
-          />
-        </label>
-        );
-      })}
-    </div>
-  );
-}
-
 function updateAt<T>(arr: T[], index: number, value: T): T[] {
   const next = [...arr];
   next[index] = value;
@@ -133,31 +66,15 @@ export default function ChichaConfiguratorModal({
   onClose: () => void;
 }) {
   const { addConfiguredChicha } = useCart();
-  const isPack = Boolean(chicha.isPack);
-  const isDuo = Boolean(chicha.isDuo);
-  const isSoiree = Boolean(chicha.isSoiree);
-  const totalSteps = isPack ? 3 : isDuo ? 2 : isSoiree ? 3 : 1;
-  const stepLabels = isPack
-    ? ["Goût", "Boisson", "Bonbon"]
-    : isDuo
-      ? ["Goût 1", "Goût 2"]
-      : isSoiree
-        ? ["Chicha 1", "Chicha 2", "Chicha 3"]
-        : [];
+  const totalSteps = chicha.chichaCount;
+  const stepLabels =
+    totalSteps > 1 ? Array.from({ length: totalSteps }, (_, i) => `Chicha ${i + 1}`) : [];
 
   const [step, setStep] = useState(1);
-  const [flavorId, setFlavorId] = useState(chichaFlavors[0].id);
-  const [secondFlavorId, setSecondFlavorId] = useState(chichaFlavors[0].id);
+  const [flavorIds, setFlavorIds] = useState<string[]>(
+    Array(totalSteps).fill(chichaFlavors[0].id),
+  );
   const [recharge, setRecharge] = useState(false);
-  const [packDrinkId, setPackDrinkId] = useState<string | null>(null);
-  const [packSweetId, setPackSweetId] = useState<string | null>(null);
-  const [soireeFlavorIds, setSoireeFlavorIds] = useState<string[]>([
-    chichaFlavors[0].id,
-    chichaFlavors[0].id,
-    chichaFlavors[0].id,
-  ]);
-  const [soireeDrinkIds, setSoireeDrinkIds] = useState<(string | null)[]>([null, null, null]);
-  const [soireeSweetIds, setSoireeSweetIds] = useState<(string | null)[]>([null, null, null]);
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -173,101 +90,31 @@ export default function ChichaConfiguratorModal({
     };
   }, [onClose]);
 
-  const packDrink = drinkSupplements.find((d) => d.id === packDrinkId);
-  const packSweet = sweetSupplements.find((s) => s.id === packSweetId);
-
-  const selectedDrinks =
-    isPack && packDrink
-      ? [{ id: packDrink.id, name: packDrink.name, price: drinkSurcharge(packDrink) }]
-      : [];
-  const selectedSweets =
-    isPack && packSweet
-      ? [{ id: packSweet.id, name: packSweet.name, price: sweetSurcharge(packSweet) }]
-      : [];
-
-  const soireeDrinkSurchargeTotal = isSoiree
-    ? soireeDrinkIds.reduce((sum, id) => {
-        const drink = drinkSupplements.find((d) => d.id === id);
-        return sum + (drink ? drinkSurcharge(drink) : 0);
-      }, 0)
-    : 0;
-  const soireeSweetSurchargeTotal = isSoiree
-    ? soireeSweetIds.reduce((sum, id) => {
-        const sweet = sweetSupplements.find((s) => s.id === id);
-        return sum + (sweet ? sweetSurcharge(sweet) : 0);
-      }, 0)
-    : 0;
-
-  const unitPrice =
-    chicha.price +
-    (recharge ? rechargeSupplement.price : 0) +
-    (isPack && packDrink ? drinkSurcharge(packDrink) : 0) +
-    (isPack && packSweet ? sweetSurcharge(packSweet) : 0) +
-    soireeDrinkSurchargeTotal +
-    soireeSweetSurchargeTotal;
+  const unitPrice = chicha.price + (recharge ? rechargeSupplement.price : 0);
 
   const handleAdd = () => {
-    if (isSoiree) {
-      const flavors = soireeFlavorIds.map((id) => chichaFlavors.find((f) => f.id === id)!);
-      const drinks = soireeDrinkIds.map((id) => {
-        const drink = drinkSupplements.find((d) => d.id === id)!;
-        return { id: drink.id, name: drink.name, price: drinkSurcharge(drink) };
-      });
-      const sweets = soireeSweetIds.map((id) => {
-        const sweet = sweetSupplements.find((s) => s.id === id)!;
-        return { id: sweet.id, name: sweet.name, price: sweetSurcharge(sweet) };
-      });
+    const flavors = flavorIds.map((id) => chichaFlavors.find((f) => f.id === id)!);
 
-      addConfiguredChicha({
-        chichaId: chicha.id,
-        chichaName: chicha.name,
-        chichaEmoji: chicha.emoji,
-        flavorId: flavors[0].id,
-        flavorName: flavors[0].name,
-        secondFlavorId: flavors[1].id,
-        secondFlavorName: flavors[1].name,
-        thirdFlavorId: flavors[2].id,
-        thirdFlavorName: flavors[2].name,
-        recharge: false,
-        drinks,
-        sweets,
-        unitPrice,
-        quantity,
-      });
-    } else {
-      const flavor = chichaFlavors.find((f) => f.id === flavorId)!;
-      const secondFlavor = isDuo
-        ? chichaFlavors.find((f) => f.id === secondFlavorId)!
-        : null;
-
-      addConfiguredChicha({
-        chichaId: chicha.id,
-        chichaName: chicha.name,
-        chichaEmoji: chicha.emoji,
-        flavorId: flavor.id,
-        flavorName: flavor.name,
-        secondFlavorId: secondFlavor?.id,
-        secondFlavorName: secondFlavor?.name,
-        recharge,
-        drinks: selectedDrinks,
-        sweets: selectedSweets,
-        unitPrice,
-        quantity,
-      });
-    }
+    addConfiguredChicha({
+      chichaId: chicha.id,
+      chichaName: chicha.name,
+      chichaEmoji: chicha.emoji,
+      flavorId: flavors[0].id,
+      flavorName: flavors[0].name,
+      secondFlavorId: flavors[1]?.id,
+      secondFlavorName: flavors[1]?.name,
+      thirdFlavorId: flavors[2]?.id,
+      thirdFlavorName: flavors[2]?.name,
+      recharge,
+      drinks: [],
+      sweets: [],
+      unitPrice,
+      quantity,
+    });
 
     setJustAdded(true);
     setTimeout(onClose, 500);
   };
-
-  const canGoNext =
-    isPack && step === 2
-      ? Boolean(packDrinkId)
-      : isPack && step === 3
-        ? Boolean(packSweetId)
-        : isSoiree
-          ? Boolean(soireeDrinkIds[step - 1]) && Boolean(soireeSweetIds[step - 1])
-          : true;
 
   return (
     <div
@@ -334,146 +181,54 @@ export default function ChichaConfiguratorModal({
         )}
 
         <div className="flex-1 overflow-y-auto p-5">
-          {isDuo && step === 1 && (
-            <section>
+          <section>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
+              {totalSteps > 1 ? `Chicha ${step} — Goût` : "Choix du goût "}
+              {totalSteps === 1 && <span className="text-muted">— obligatoire</span>}
+            </h3>
+            <FlavorGrid
+              selectedId={flavorIds[step - 1]}
+              onSelect={(id) => setFlavorIds((ids) => updateAt(ids, step - 1, id))}
+              name={`flavor-${step}`}
+            />
+          </section>
+
+          {step === totalSteps && (
+            <section className="mt-6">
               <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                Goût de la première chicha
+                Supplément
               </h3>
-              <FlavorGrid selectedId={flavorId} onSelect={setFlavorId} name="flavor-1" />
-            </section>
-          )}
-
-          {isDuo && step === 2 && (
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                Goût de la seconde chicha
-              </h3>
-              <FlavorGrid
-                selectedId={secondFlavorId}
-                onSelect={setSecondFlavorId}
-                name="flavor-2"
-              />
-            </section>
-          )}
-
-          {!isDuo && !isSoiree && (!isPack || step === 1) && (
-            <>
-              {/* Goût */}
-              <section>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                  Choix du goût <span className="text-muted">— obligatoire</span>
-                </h3>
-                <FlavorGrid selectedId={flavorId} onSelect={setFlavorId} name="flavor" />
-              </section>
-
-              {/* Supplément chicha */}
-              <section className="mt-6">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                  Supplément chicha
-                </h3>
-                <div className="mt-3 flex flex-col gap-2">
-                  <label className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm hover:bg-secondary/60">
-                    <span className="flex items-start gap-3">
-                      <Image
-                        src={rechargeSupplement.image}
-                        alt={rechargeSupplement.name}
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
-                      />
-                      <span>
-                        <span className="text-ink">
-                          {rechargeSupplement.name}
-                          <span className="ml-2 font-mono text-xs text-muted">
-                            +{rechargeSupplement.price.toFixed(2)} €
-                          </span>
-                        </span>
-                        <span className="mt-0.5 block text-xs text-muted">
-                          {rechargeSupplement.description}
+              <div className="mt-3 flex flex-col gap-2">
+                <label className="flex cursor-pointer items-start justify-between gap-3 rounded-lg border border-border px-4 py-2.5 text-sm hover:bg-secondary/60">
+                  <span className="flex items-start gap-3">
+                    <Image
+                      src={rechargeSupplement.image}
+                      alt={rechargeSupplement.name}
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 flex-shrink-0 rounded-md object-cover"
+                    />
+                    <span>
+                      <span className="text-ink">
+                        {rechargeSupplement.name}
+                        <span className="ml-2 font-mono text-xs text-muted">
+                          +{rechargeSupplement.price.toFixed(2)} €
                         </span>
                       </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {rechargeSupplement.description}
+                      </span>
                     </span>
-                    <input
-                      type="checkbox"
-                      checked={recharge}
-                      onChange={(e) => setRecharge(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 flex-shrink-0 accent-signal"
-                    />
-                  </label>
-                </div>
-              </section>
-            </>
-          )}
-
-          {isPack && step === 2 && (
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                Boisson <span className="text-muted">— incluse, au choix</span>
-              </h3>
-              <SupplementList
-                items={drinkSupplements}
-                selectedId={packDrinkId}
-                onSelect={setPackDrinkId}
-                name="pack-drink"
-                surchargeFor={drinkSurcharge}
-              />
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={recharge}
+                    onChange={(e) => setRecharge(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 accent-signal"
+                  />
+                </label>
+              </div>
             </section>
-          )}
-
-          {isPack && step === 3 && (
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                Sucreries <span className="text-muted">— incluse, au choix</span>
-              </h3>
-              <SupplementList
-                items={sweetSupplements}
-                selectedId={packSweetId}
-                onSelect={setPackSweetId}
-                name="pack-sweet"
-                surchargeFor={sweetSurcharge}
-              />
-            </section>
-          )}
-
-          {isSoiree && step >= 1 && step <= 3 && (
-            <>
-              <section>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                  Chicha {step} — Goût
-                </h3>
-                <FlavorGrid
-                  selectedId={soireeFlavorIds[step - 1]}
-                  onSelect={(id) => setSoireeFlavorIds((ids) => updateAt(ids, step - 1, id))}
-                  name={`soiree-flavor-${step}`}
-                />
-              </section>
-
-              <section className="mt-6">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                  Chicha {step} — Boisson <span className="text-muted">— incluse, au choix</span>
-                </h3>
-                <SupplementList
-                  items={drinkSupplements}
-                  selectedId={soireeDrinkIds[step - 1]}
-                  onSelect={(id) => setSoireeDrinkIds((ids) => updateAt(ids, step - 1, id))}
-                  name={`soiree-drink-${step}`}
-                  surchargeFor={drinkSurcharge}
-                />
-              </section>
-
-              <section className="mt-6">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-                  Chicha {step} — Bonbon <span className="text-muted">— inclus, au choix</span>
-                </h3>
-                <SupplementList
-                  items={sweetSupplements}
-                  selectedId={soireeSweetIds[step - 1]}
-                  onSelect={(id) => setSoireeSweetIds((ids) => updateAt(ids, step - 1, id))}
-                  name={`soiree-sweet-${step}`}
-                  surchargeFor={sweetSurcharge}
-                />
-              </section>
-            </>
           )}
         </div>
 
@@ -516,8 +271,7 @@ export default function ChichaConfiguratorModal({
             <button
               type="button"
               onClick={() => setStep((s) => s + 1)}
-              disabled={!canGoNext}
-              className="flex flex-1 items-center justify-center rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex flex-1 items-center justify-center rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover"
             >
               Suivant
             </button>
@@ -525,7 +279,7 @@ export default function ChichaConfiguratorModal({
             <button
               type="button"
               onClick={handleAdd}
-              disabled={justAdded || !canGoNext}
+              disabled={justAdded}
               className="flex flex-1 items-center justify-between rounded-lg bg-signal px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-signal-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span>{justAdded ? "Ajouté ✓" : "Ajouter au panier"}</span>
